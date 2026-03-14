@@ -1,0 +1,156 @@
+%-------------------------
+% Resume in Latex
+% Author : Rakshit Kumar
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{graphicx}
+\input{glyphtounicode}
+
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\textwidth}{1.19in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+\urlstyle{same}
+\raggedright
+
+\RequirePackage{xcolor}
+\definecolor{cvblue}{HTML}{0E5484}
+\definecolor{myblack}{HTML}{130810}     % renamed from 'black' to 'myblack' to avoid conflicts
+\definecolor{darkcolor}{HTML}{0F4539}
+\definecolor{cvgreen}{HTML}{3BD80D}
+\definecolor{taggreen}{HTML}{00E278}
+\definecolor{SlateGrey}{HTML}{2E2E2E}
+\definecolor{LightGrey}{HTML}{666666}
+
+\colorlet{name}{myblack}                 % updated to use myblack
+\colorlet{tagline}{darkcolor}
+\colorlet{heading}{darkcolor}
+\colorlet{headingrule}{cvblue}
+\colorlet{accent}{darkcolor}
+\colorlet{emphasis}{SlateGrey}
+\colorlet{body}{LightGrey}
+
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{myblack}\titlerule \vspace{-5pt}]  % use myblack here as well
+
+\pdfgentounicode=1
+
+\newcommand{\resumeItem}[1]{\item\small{{#1 \vspace{-2pt}}}}
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textbf{#2} \\
+      \textit{#3} & \textit{#4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & \textbf{\small #2}\\
+    \end{tabular*}\vspace{-7pt}
+}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}  
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}  
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0.15in]}  
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\begin{document}
+
+\begin{center}
+  {\Huge \scshape RAKSHIT KUMAR} \\ \vspace{1pt}
+  Patna, Bihar \\ \vspace{1pt}
+  \small
+  \href{tel:+917091656096}{\faPhone\ +91 7091656096} ~
+  \href{mailto:rakshitkumar.5905@gmail.com}{\faEnvelope\ rakshitkumar.5905@gmail.com} ~
+  \href{https://linkedin.com/in/rakshit-kumar-9979b1292}{\faLinkedin\ LinkedIn} ~
+  \href{https://github.com/rakshit432}{\faGithub\ GitHub}
+\end{center}
+
+%-----------EDUCATION-----------
+\section{EDUCATION}
+\resumeSubHeadingListStart
+  \resumeSubheading{Birla Institute of Technology, Mesra}{Sept 2023 – Present}{B.Tech in Computer Science and Engineering}{CGPA: \textbf{8.03 / 10.0}}
+  \resumeSubheading{Shivam Convent, Patna}{2020 – 2022}{Senior Secondary (XII), CBSE}{82.4\%}
+  \resumeSubheading{Open Minds – A Birla School}{2009 – 2020}{Secondary (X), CBSE}{93\%}
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{PROJECTS}
+\resumeSubHeadingListStart
+
+\resumeProjectHeading{\textbf{\href{https://blogonspot.vercel.app}{BlogOnSpot — MERN Blogging Platform}} $|$ Vercel, Render}{}
+\resumeItemListStart
+  \resumeItem{Developed full-stack platform for 200+ users with JWT auth, admin moderation, and secure CRUD operations.}
+  \resumeItem{Integrated AI-powered blog summarization and plagiarism detection, reducing review time by 40\%.}
+  \resumeItem{Implemented hover-based content previews and dashboard analytics improving engagement by 25\%.}
+\resumeItemListEnd
+
+\resumeProjectHeading{\textbf{\href{https://resumebuilder-frontend-6gjz.onrender.com/}{Resume Builder — MERN Application}} $|$ React, Express, MongoDB}{}
+\resumeItemListStart
+  \resumeItem{Built resume creation tool enabling users to design and export resumes with a responsive, Tailwind-based UI.}
+  \resumeItem{Added JWT-based authentication, multi-resume management, and AI suggestions for 10+ skill categories.}
+  \resumeItem{Achieved 30\% faster data handling through optimized MongoDB schema and API structure.}
+\resumeItemListEnd
+
+\resumeProjectHeading{\textbf{Mediversal — Appointment Booking System (In Progress)} $|$ MERN Stack}{}
+\resumeItemListStart
+  \resumeItem{Architected appointment platform supporting 3 roles (Admin, Doctor, Patient) with real-time schedule sync.}
+  \resumeItem{Improved backend efficiency by 20\% using modular Express routing and middleware-based validation.}
+  \resumeItem{Planned integration of payment gateway and analytics dashboard for 50+ expected active users.}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------TECHNICAL SKILLS-----------
+\section{TECHNICAL SKILLS}
+\begin{itemize}[leftmargin=0.15in, label={}]
+\small{
+\item \textbf{Languages:} Java, C++, Python, SQL, JavaScript \\
+\item \textbf{Web Technologies:} React.js, Node.js, Express.js, MongoDB, Tailwind CSS, REST APIs \\
+\item \textbf{Tools \& Platforms:} Git, GitHub, VS Code, Linux, Jupyter Notebook \\
+\item \textbf{Libraries:} NumPy, Pandas \\
+\item \textbf{CS Concepts:} OOP, DSA, DBMS, Operating Systems
+}
+\end{itemize}
+
+%-----------EXTRACURRICULAR-----------
+\section{EXTRACURRICULAR}
+\resumeSubHeadingListStart
+  \resumeItemListStart
+    \resumeItem{Acted in 4+ college drama productions; directed a stage monologue viewed by 300+ attendees.}
+    \resumeItem{Organized and promoted 2+ NSS technical drives, increasing event turnout by 35\%.}
+    \resumeItem{Volunteered for BIT Mesra’s flagship fests — Bitotsav \& Pantheon — managing 10+ sponsors.}
+  \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------POSITIONS OF RESPONSIBILITY-----------
+\section{POSITIONS OF RESPONSIBILITY}
+\resumeSubHeadingListStart
+  \resumeItemListStart
+    \resumeItem{\textbf{Cyber \& Web Lead — NSS Executive Body:} Led team of 6 in building website modules and event dashboards.}
+    \resumeItem{\textbf{Sponsorship Lead — Finance Club:} Managed 15+ sponsor communications, securing ₹30K in funding.}
+  \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------ACHIEVEMENTS-----------
+\section{ACHIEVEMENTS}
+\resumeSubHeadingListStart
+  \resumeItemListStart
+    \resumeItem{Solved 700+ problems across LeetCode, Codeforces, and GFG — improving accuracy by 20\% in 3 months.}
+    \resumeItem{Scored 97.83 percentile in JEE Mains among 1.5M+ candidates nationwide.}
+    \resumeItem{Awarded “All-Rounder of the Year” for excellence in academics, leadership, and arts.}
+  \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+\end{document}
