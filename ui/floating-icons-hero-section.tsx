@@ -120,10 +120,10 @@ const FloatingIcon = ({
 /* ------------------------------------------------------------------ */
 
 export const FloatingIconsHero = React.forwardRef<
-  HTMLDivElement,
+  HTMLElement,
   FloatingIconsHeroProps
 >(({ title, subtitle, ctaText, ctaHref, icons, className }, ref) => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLElement>(null);
   const iconsRef = React.useRef<HTMLDivElement[]>([]);
   const mouseX = React.useRef(0);
   const mouseY = React.useRef(0);

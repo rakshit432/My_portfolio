@@ -33,7 +33,7 @@ const EDUCATION = [
 ]
 
 export default function Experience() {
-    const containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLElement>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start end", "end start"]

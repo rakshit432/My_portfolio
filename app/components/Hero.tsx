@@ -15,7 +15,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Hero() {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLElement>(null);
 
   /* ---------------- GSAP Scroll Magic ---------------- */
   useEffect(() => {
