@@ -123,7 +123,7 @@ export const FloatingIconsHero = React.forwardRef<
   HTMLElement,
   FloatingIconsHeroProps
 >(({ title, subtitle, ctaText, ctaHref, icons, className }, ref) => {
-  const containerRef = React.useRef<HTMLElement>(null);
+  const containerRef = React.useRef<HTMLElement | null>(null);
   const iconsRef = React.useRef<HTMLDivElement[]>([]);
   const mouseX = React.useRef(0);
   const mouseY = React.useRef(0);
@@ -202,7 +202,11 @@ export const FloatingIconsHero = React.forwardRef<
     <section
       ref={(el) => {
         containerRef.current = el;
-        if (typeof ref === 'function') ref(el);
+        if (typeof ref === 'function') {
+          ref(el);
+        } else if (ref) {
+          ref.current = el;
+        }
       }}
       onMouseMove={handleMouseMove}
       className={cn(
