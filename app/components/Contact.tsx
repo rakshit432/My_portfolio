@@ -55,7 +55,7 @@ export default function Contact() {
       } else {
         setFormStatus("error");
       }
-    } catch (error) {
+    } catch {
       setFormStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -104,12 +104,12 @@ export default function Contact() {
             </span>
 
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-white">
-              LET'S WORK <br />
+              LET&apos;S WORK <br />
               <span className="text-white/40">TOGETHER</span>
             </h2>
 
             <p className="text-lg text-white/50 max-w-sm">
-              Have a project in mind? Let's build something that solves real
+              Have a project in mind? Let&apos;s build something that solves real
               problems.
             </p>
           </div>

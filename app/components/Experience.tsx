@@ -132,7 +132,7 @@ export default function Experience() {
                     </div>
 
                     {/* Education Items */}
-                    {EDUCATION.map((item, index) => (
+                    {EDUCATION.map((item) => (
                         <motion.div
                             key={item.id}
                             initial={{ opacity: 0, x: -50 }}

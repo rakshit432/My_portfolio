@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
     const [count, setCount] = useState(0);

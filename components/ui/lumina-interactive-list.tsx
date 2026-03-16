@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 
 import React, { useEffect, useRef } from 'react';
 
@@ -57,7 +59,7 @@ export function Component() {
             let currentSlideIndex = 0;
             let isTransitioning = false;
             let shaderMaterial: any, renderer: any, scene: any, camera: any;
-            let slideTextures: any[] = [];
+            const slideTextures: any[] = [];
             let texturesLoaded = false;
             let autoSlideTimer: any = null;
             let progressAnimation: any = null;

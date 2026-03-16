@@ -52,7 +52,7 @@ export const renderCustomIcon = (icon: SimpleIcon, theme: string) => {
             href: undefined,
             target: undefined,
             rel: undefined,
-            onClick: (e: any) => e.preventDefault(),
+            onClick: (e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault(),
         },
     })
 }
@@ -69,7 +69,11 @@ export function IconCloud({ iconSlugs }: DynamicCloudProps) {
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true)
+    }, [])
+
+    useEffect(() => {
         fetchSimpleIcons({ slugs: iconSlugs }).then(setData)
     }, [iconSlugs])
 
@@ -84,7 +88,6 @@ export function IconCloud({ iconSlugs }: DynamicCloudProps) {
     if (!mounted) return null
 
     return (
-        // @ts-ignore
         <Cloud {...cloudProps}>
             <>{renderedIcons}</>
         </Cloud>

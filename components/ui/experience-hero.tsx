@@ -97,7 +97,7 @@ export const Component = () => {
                         { id: "03", title: "LOCATION", val: "India", type: "data" }
                     ].map((item) => (
                         <div key={item.id} className="command-cell glass-panel p-6 sm:p-7 block opacity-1 border border-white/10 bg-white/5 backdrop-blur-md">
-                            <span className="font-mono text-[9px] text-white/40 uppercase tracking-widest block mb-3">{item.id} // {item.title}</span>
+                            <span className="font-mono text-[9px] text-white/40 uppercase tracking-widest block mb-3">{item.id} {"//"} {item.title}</span>
                             {item.type === "progress" ? (
                                 <div className="flex justify-between items-end mt-2">
                                     <h4 className="text-2xl sm:text-3xl font-bold text-white tracking-tighter">{item.val}</h4>

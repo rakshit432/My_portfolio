@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const SKILLS = [
   {
@@ -85,6 +85,7 @@ const FloatingBadge = ({ text, x, y, delay }: { text: string, x: string, y: stri
     animate={{
       opacity: [0, 0.5, 0],
       y: [0, -40],
+      // eslint-disable-next-line react-hooks/purity
       x: [0, Math.random() * 20 - 10]
     }}
     transition={{
@@ -194,7 +195,7 @@ export default function Skills() {
 
               <div className="relative z-10 flex items-center justify-between mb-8">
                 <h3 className="text-sm font-mono uppercase tracking-[0.2em] text-white/50 group-hover:text-white transition-colors">
-                            // {group.category}
+                  {/* {group.category} */}
                 </h3>
                 {/* Animated Icon/Dot */}
                 <div className="w-2 h-2 rounded-full bg-white/20 group-hover:bg-indigo-400 transition-colors animate-pulse" />
