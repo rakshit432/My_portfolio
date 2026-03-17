@@ -132,22 +132,15 @@ export default function Skills() {
           className="flex flex-col md:flex-row gap-12 md:gap-24 mb-20 items-start"
         >
           <div className="flex-1">
-            <motion.h2
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-4xl md:text-7xl font-bold tracking-tighter text-white mb-6"
-            >
-              TECHNICAL <br /> <span className="text-white/40">ARSENAL</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-white/60 max-w-lg font-light leading-relaxed"
-            >
-              Curated suite of technologies I leverage to build scalable, high-performance digital solutions.
-            </motion.p>
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white mb-6">
+                TECHNICAL <br /> 
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 drop-shadow-lg">
+                  ARSENAL
+                </span>
+              </h2>
+              <p className="text-white/70 max-w-lg font-medium tracking-wide leading-relaxed text-lg pb-4">
+                Curated suite of technologies I leverage to build scalable, high-performance digital solutions.
+              </p>
           </div>
 
           {/* Stats with Counters */}
@@ -188,14 +181,14 @@ export default function Skills() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ margin: "-50px" }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="relative z-10 group p-6 md:p-8 rounded-3xl border border-white/10 bg-black/40 hover:bg-white/5 transition-all duration-500 overflow-hidden hover:border-white/20 hover:shadow-2xl hover:shadow-indigo-500/10"
+              className="relative z-10 group p-6 md:p-8 rounded-[24px] border border-white/5 bg-white/[0.02] backdrop-blur-xl hover:bg-white/[0.06] transition-all duration-700 overflow-hidden hover:border-white/20 shadow-xl hover:shadow-[0_0_40px_-10px_rgba(99,102,241,0.3)] hover:-translate-y-2"
             >
               {/* Inner Shimmer */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
               <div className="relative z-10 flex items-center justify-between mb-8">
-                <h3 className="text-sm font-mono uppercase tracking-[0.2em] text-white/50 group-hover:text-white transition-colors">
-                  {/* {group.category} */}
+                <h3 className="text-sm font-bold tracking-[0.2em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-400 group-hover:from-white group-hover:to-white transition-all duration-300">
+                  {group.category}
                 </h3>
                 {/* Animated Icon/Dot */}
                 <div className="w-2 h-2 rounded-full bg-white/20 group-hover:bg-indigo-400 transition-colors animate-pulse" />
@@ -213,8 +206,8 @@ export default function Skills() {
                       <motion.div
                         initial={{ width: 0 }}
                         whileInView={{ width: `${skill.level}%` }}
-                        transition={{ duration: 1, ease: "easeOut", delay: 0.2 + (sIdx * 0.1) }}
-                        className="h-full bg-indigo-500/80 rounded-full group-hover:bg-white transition-colors duration-300"
+                        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 + (sIdx * 0.1) }}
+                        className="h-full bg-gradient-to-r from-indigo-500 rounded-full group-hover:to-purple-500 group-hover:from-white transition-all duration-500"
                       />
                     </div>
                   </div>

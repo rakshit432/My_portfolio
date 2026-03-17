@@ -71,10 +71,10 @@ export function Component() {
 
             // --- UPDATED SLIDES DATA ---
             const slides = [
-                { title: "Smartchoice Homes", description: "Premium luxury real estate platform. Experience dynamic property filtration and seamless administrative management.", media: "/projects/smartchoice-homes.png", liveUrl: "https://smartchoicehomes.vercel.app", githubUrl: "https://github.com/rakshit432/Smart_choice_homes" },
-                { title: "BlogOnSpot", description: "Minimalist, AI-driven full-stack blogging ecosystem. Engineered with JWT auth and powerful moderation tools.", media: "/projects/blogonspot.png", liveUrl: "https://blogonspot.vercel.app", githubUrl: "https://github.com/rakshit432/BlogOnSpot" },
-                { title: "Mediversal", description: "The next generation of healthcare access. Featuring AI symptom analysis and dedicated multi-role dashboards.", media: "/projects/mediversal.png", liveUrl: "https://mediversal-tf2h.vercel.app", adminUrl: "https://mediversal-n29o.vercel.app", githubUrl: "https://github.com/rakshit432/Mediversal" },
-                { title: "Future Meet", description: "Sleek, real-time video conferencing architecture engineered for the modern collaborative workflow.", media: "/projects/future-meet.png", liveUrl: "https://future-meet.vercel.app", githubUrl: "https://github.com/rakshit432/future-meet" }
+                { title: "Smartchoice Homes", description: "Premium luxury real estate platform. Experience dynamic property filtration and seamless administrative management.", media: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop", liveUrl: "https://smartchoicehomes.vercel.app", githubUrl: "https://github.com/rakshit432/Smart_choice_homes" },
+                { title: "BlogOnSpot", description: "Minimalist, AI-driven full-stack blogging ecosystem. Engineered with JWT auth and powerful moderation tools.", media: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop", liveUrl: "https://blogonspot.vercel.app", githubUrl: "https://github.com/rakshit432/BlogOnSpot" },
+                { title: "Mediversal", description: "The next generation of healthcare access. Featuring AI symptom analysis and dedicated multi-role dashboards.", media: "https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?q=80&w=2070&auto=format&fit=crop", liveUrl: "https://mediversal-tf2h.vercel.app", adminUrl: "https://mediversal-n29o.vercel.app", githubUrl: "https://github.com/rakshit432/Mediversal" },
+                { title: "Future Meet", description: "Sleek, real-time video conferencing architecture engineered for the modern collaborative workflow.", media: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop", liveUrl: "https://future-meet.vercel.app", githubUrl: "https://github.com/rakshit432/future-meet" }
             ];
 
             // --- SHADERS ---
@@ -123,10 +123,6 @@ export function Component() {
                 if (u.uGlobalIntensity) u.uGlobalIntensity.value = s.globalIntensity;
             };
 
-            const splitText = (text: string) => {
-                return text.split('').map(char => `<span style="display: inline-block; opacity: 0;">${char === ' ' ? '&nbsp;' : char}</span>`).join('');
-            };
-
             const updateContent = (idx: number) => {
                 const titleEl = document.getElementById('mainTitle');
                 const descEl = document.getElementById('mainDesc');
@@ -135,7 +131,7 @@ export function Component() {
                 const githubEl = document.getElementById('githubBtn');
 
                 if (titleEl && descEl) {
-                    gsap.to(titleEl.children, { y: -20, opacity: 0, duration: 0.5, stagger: 0.02, ease: "power2.in" });
+                    gsap.to(titleEl, { y: -20, opacity: 0, duration: 0.5, ease: "power2.in" });
                     gsap.to(descEl, { y: -10, opacity: 0, duration: 0.4, ease: "power2.in" });
                     if (liveEl) gsap.to(liveEl, { opacity: 0, y: 10, duration: 0.3 });
                     if (adminEl) gsap.to(adminEl, { opacity: 0, y: 10, duration: 0.3 });
@@ -145,7 +141,7 @@ export function Component() {
                         // Check if mounted
                         if (!isMounted) return;
 
-                        titleEl.innerHTML = splitText(slides[idx].title);
+                        titleEl.textContent = slides[idx].title;
                         descEl.textContent = slides[idx].description;
 
                         // UPDATE BUTTON URL
@@ -165,17 +161,17 @@ export function Component() {
                             githubEl.style.display = (url && url !== "#") ? "inline-flex" : "none";
                         }
 
-                        gsap.set(titleEl.children, { y: 20, opacity: 0 });
+                        gsap.set(titleEl, { y: 20, opacity: 0 });
                         gsap.set(descEl, { y: 20, opacity: 0 });
                         if (liveEl) gsap.set(liveEl, { opacity: 0, y: 10 });
                         if (adminEl) gsap.set(adminEl, { opacity: 0, y: 10 });
                         if (githubEl) gsap.set(githubEl, { opacity: 0, y: 10 });
 
-                        gsap.to(titleEl.children, { y: 0, opacity: 1, duration: 0.8, stagger: 0.03, ease: "power3.out" });
-                        gsap.to(descEl, { y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: "power3.out" });
-                        if (liveEl) gsap.to(liveEl, { opacity: 1, y: 0, duration: 0.6, delay: 0.4, ease: "power2.out" });
-                        if (adminEl) gsap.to(adminEl, { opacity: 1, y: 0, duration: 0.6, delay: 0.45, ease: "power2.out" });
-                        if (githubEl) gsap.to(githubEl, { opacity: 1, y: 0, duration: 0.6, delay: 0.5, ease: "power2.out" });
+                        gsap.to(titleEl, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" });
+                        gsap.to(descEl, { y: 0, opacity: 1, duration: 0.8, delay: 0.1, ease: "power3.out" });
+                        if (liveEl) gsap.to(liveEl, { opacity: 1, y: 0, duration: 0.6, delay: 0.2, ease: "power2.out" });
+                        if (adminEl) gsap.to(adminEl, { opacity: 1, y: 0, duration: 0.6, delay: 0.25, ease: "power2.out" });
+                        if (githubEl) gsap.to(githubEl, { opacity: 1, y: 0, duration: 0.6, delay: 0.3, ease: "power2.out" });
                     }, 500);
                 }
             };
@@ -327,7 +323,7 @@ export function Component() {
             const githubEl = document.getElementById('githubBtn') as HTMLAnchorElement;
 
             if (tEl && dEl) {
-                tEl.innerHTML = splitText(slides[0].title);
+                tEl.textContent = slides[0].title;
                 dEl.textContent = slides[0].description;
                 if (liveEl) {
                     liveEl.href = slides[0].liveUrl || "#";
@@ -342,11 +338,11 @@ export function Component() {
                     githubEl.style.display = (slides[0].githubUrl && slides[0].githubUrl !== "#") ? "inline-flex" : "none";
                 }
                 // animate initial in
-                gsap.fromTo(tEl.children, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.03, ease: "power3.out", delay: 0.5 });
-                gsap.fromTo(dEl, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.8 });
-                if (liveEl) gsap.fromTo(liveEl, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 1 });
-                if (adminEl) gsap.fromTo(adminEl, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 1.05 });
-                if (githubEl) gsap.fromTo(githubEl, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 1.1 });
+                gsap.fromTo(tEl, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.5 });
+                gsap.fromTo(dEl, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.7 });
+                if (liveEl) gsap.fromTo(liveEl, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 0.9 });
+                if (adminEl) gsap.fromTo(adminEl, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 0.95 });
+                if (githubEl) gsap.fromTo(githubEl, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power2.out", delay: 1.0 });
             }
 
             initRenderer();
@@ -387,11 +383,23 @@ export function Component() {
           background: transparent;
         }
         
+        .slider-wrapper::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+          opacity: 0.05;
+          z-index: 6;
+          pointer-events: none;
+          mix-blend-mode: overlay;
+        }
+        
         .slider-wrapper::after {
           content: "";
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.7) 100%);
+          background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.95) 100%),
+                      linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.8) 100%);
           z-index: 5;
           pointer-events: none;
         }
@@ -415,20 +423,24 @@ export function Component() {
         .slide-title {
           font-family: 'Inter', sans-serif;
           font-size: clamp(3rem, 7vw, 6.5rem);
-          font-weight: 800;
-          line-height: 1;
+          font-weight: 900;
+          line-height: 1.1;
           margin-bottom: 1.2rem;
           letter-spacing: -0.04em;
-          text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+          text-transform: uppercase;
+          background: linear-gradient(to right, #ffffff, #d1d5db);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
         }
         .slide-description {
           font-family: 'Plus Jakarta Sans', sans-serif;
-          font-size: clamp(1rem, 1.2vw, 1.25rem);
-          font-weight: 300;
-          opacity: 0.85;
-          margin-bottom: 2rem;
-          line-height: 1.6;
-          text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+          font-size: clamp(1.1rem, 1.25vw, 1.35rem);
+          font-weight: 400;
+          opacity: 0.9;
+          margin-bottom: 2.5rem;
+          line-height: 1.7;
+          text-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
         /* PROJECT BUTTON STYLE */
         .project-btn-container {
@@ -439,27 +451,29 @@ export function Component() {
         .project-btn {
           display: inline-flex;
           align-items: center;
-          gap: 0.6rem;
+          gap: 0.75rem;
           pointer-events: auto; /* Enable clicks */
-          padding: 0.8rem 1.8rem;
-          border: 1px solid rgba(255,255,255,0.2);
-          border-radius: 9999px;
+          padding: 1rem 2rem;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 12px;
           font-family: 'Plus Jakarta Sans', sans-serif;
-          font-weight: 600;
+          font-weight: 700;
           font-size: 0.75rem;
           text-transform: uppercase;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.2em;
           color: white;
           text-decoration: none;
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           opacity: 0;
-          background: rgba(0,0,0,0.3);
-          backdrop-filter: blur(8px);
+          background: rgba(255,255,255,0.03);
+          backdrop-filter: blur(12px);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         .project-btn:hover {
-          background: white;
-          color: black;
-          border-color: white;
+          background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
+          border-color: transparent;
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(99,102,241,0.4);
         }
         
         .slides-navigation {

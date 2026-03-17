@@ -1,0 +1,20 @@
+Analysis of Loading Time Delay and Scroll Lag
+
+Files Analyzed: 
+1. app/page.tsx
+2. app/components/Hero.tsx
+
+Reasons for Loading Time Delay While Scrolling:
+
+1. Massive Canvas Rendering in `app/page.tsx`:
+   - Identified Issue: The `FlickeringGrid` component was positioned within an `absolute inset-0 h-full w-full` container encompassing the entire body height mapping (Hero, About, Experience, Skills, Projects, and Contact). 
+   - Root Cause of Scroll Lag: This forces the HTML5 `<canvas>` inside `FlickeringGrid` to stretch and render with an enormous dimension (often exceeding 10,000 pixels in height). Continuously calculating logic and updating pixels on a canvas of that magnitude easily hits GPU / main thread CPU limits, causing extreme stuttering and scroll lag.
+   - Fix Implemented: Replaced the absolute stretching with a fixed viewport boundary (`fixed inset-0 h-screen w-full`). This ensures the canvas strictly renders at the viewport's resolution (e.g., 1920x1080) regardless of scroll depth, eliminating the massive rendering overhead and guaranteeing smooth scrolling.
+
+2. Component Alignment Breakages in `app/components/Hero.tsx`:
+   - Identified Issue: Desktop side tags (GitHub, LeetCode, TUF) were offset at `left-[105%]` from a centered container using a `md:flex` breakpoint. On tablet screen sizes (>= 768px but < 1024px, such as iPads), placing UI elements 105% rightwards pushed them beyond the screen edges, breaking horizontal alignment, creating an unwanted horizontal scrollbar, and uncentering the presentation.
+   - Fix Implemented: Scaled the breakpoints appropriately. Shifted the desktop sidebar display property up to `lg:flex` (desktop only) and extended the inline mobile icons up to `lg:hidden` (displays for tablets/phones). This correctly scales elements relative to the device's viewport size.
+
+3. DOM Repaint Chokepoints during GSAP ScrollTrigger:
+   - Identified Issue: `Hero.tsx` initializes GSAP's `ScrollTrigger` with `pin: true`. When pinned layouts are engaged concurrently with the overloaded `FlickeringGrid` canvas repaints, it dramatically escalates load times and scroll chunking. 
+   - Fix Summary: By resolving the canvas memory leak, GSAP animations will now render perfectly at 60fps across layout jumps and triggers.

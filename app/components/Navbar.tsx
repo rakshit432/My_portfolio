@@ -46,14 +46,15 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
                 className="
-                  text-xs uppercase tracking-widest
-                  text-white/70
-                  transition-colors
-                  hover:text-white
-                  cursor-pointer
+                  text-xs uppercase tracking-widest font-semibold
+                  text-white/60
+                  transition-all duration-300
+                  hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-white hover:to-white/60
+                  hover:scale-105 cursor-pointer relative group
                 "
               >
                 {item}
+                <span className="absolute -bottom-1.5 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
               </motion.a>
             ))}
           </div>
@@ -103,8 +104,8 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.1 }}
                   className="
-                    text-3xl font-light tracking-widest text-white
-                    hover:text-indigo-400 transition-colors
+                    text-4xl md:text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40
+                    hover:from-indigo-400 hover:to-purple-400 hover:scale-105 transition-all duration-300
                   "
                 >
                   {item}

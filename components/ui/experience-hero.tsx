@@ -71,8 +71,9 @@ export const Component = () => {
                     </div>
 
                     <div className="max-w-4xl lg:-translate-y-8 pr-0 md:pr-12 will-change-transform">
-                        <h1 className="text-[clamp(2.5rem,10vw,11.5rem)] font-black leading-[0.9] tracking-tighter text-white uppercase italic-none">
-                            CREATIVE <br /> <span className="text-outline">ENGINEER</span>
+                        <h1 className="text-[clamp(2.5rem,10vw,11.5rem)] font-black leading-[0.9] tracking-tighter uppercase italic-none">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-gray-400 drop-shadow-lg">CREATIVE</span> <br /> 
+                            <span className="text-transparent text-outline hover:text-white/10 transition-colors duration-1000">ENGINEER</span>
                         </h1>
                         <p className="mt-6 md:mt-8 font-mono text-[10px] md:text-[11px] text-white/60 uppercase tracking-[0.2em] max-w-sm leading-relaxed">
                             Crafting immersive digital experiences through spatial logic and advanced WebGL.

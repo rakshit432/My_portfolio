@@ -30,11 +30,12 @@ export default function Home() {
       </div>
 
       {/* Scrollable Content */}
-      <main className="relative z-10">
+      <main className="relative z-10 w-full overflow-hidden">
         <Hero />
 
-        <div className="relative">
-          <div className="absolute inset-0 -z-10 h-full w-full">
+        <div className="relative w-full">
+          {/* Fix performance: use fixed instead of absolute so the canvas matches screen resolution, averting massive layout repaints and huge canvas sizes that delay scrolling. */}
+          <div className="fixed inset-0 -z-10 h-screen w-full pointer-events-none">
             <FlickeringGrid
               className="w-full h-full"
               squareSize={4}

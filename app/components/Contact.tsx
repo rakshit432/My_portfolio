@@ -127,10 +127,10 @@ export default function Contact() {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition"
+                  className="group flex items-center gap-3 px-6 py-3 rounded-full border border-white/5 bg-white/5 hover:bg-white/10 hover:border-indigo-500/30 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all duration-300 hover:-translate-y-1"
                 >
-                  <link.icon className="w-4 h-4 text-white/60" />
-                  <span className="text-sm text-white/60">{link.name}</span>
+                  <link.icon className="w-4 h-4 text-white/50 group-hover:text-indigo-400 transition-colors" />
+                  <span className="text-sm text-white/70 group-hover:text-white transition-colors tracking-wide">{link.name}</span>
                 </a>
               ))}
             </div>
@@ -144,16 +144,16 @@ export default function Contact() {
 
             <button
               onClick={handleCopyEmail}
-              className="flex items-center gap-3 px-6 py-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition"
+              className="group flex w-full sm:w-auto items-center gap-3 px-6 py-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-indigo-500/30 transition-all duration-300 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
             >
               {copied ? (
-                <span className="text-emerald-400">Copied!</span>
+                <span className="text-emerald-400 font-medium tracking-wide">Copied automatically!</span>
               ) : (
-                <span className="text-white/80">
+                <span className="text-white/80 font-mono tracking-tight group-hover:text-white transition-colors">
                   rakshitkumar.5905@gmail.com
                 </span>
               )}
-              <Copy className="w-4 h-4 text-white/40 ml-auto" />
+              <Copy className="w-4 h-4 text-white/30 ml-auto group-hover:text-indigo-400 transition-colors" />
             </button>
           </div>
         </motion.div>
@@ -177,7 +177,7 @@ export default function Contact() {
                 type="text"
                 name="name"
                 required
-                className="w-full mt-2 bg-black border border-white/10 rounded-xl px-4 py-3 text-white"
+                className="w-full mt-2 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-300 placeholder:text-white/20"
                 placeholder="John Doe"
               />
             </div>
@@ -188,7 +188,7 @@ export default function Contact() {
                 type="email"
                 name="email"
                 required
-                className="w-full mt-2 bg-black border border-white/10 rounded-xl px-4 py-3 text-white"
+                className="w-full mt-2 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-300 placeholder:text-white/20"
                 placeholder="john@example.com"
               />
             </div>
@@ -199,7 +199,7 @@ export default function Contact() {
                 name="message"
                 rows={4}
                 required
-                className="w-full mt-2 bg-black border border-white/10 rounded-xl px-4 py-3 text-white resize-none"
+                className="w-full mt-2 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white resize-none focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-300 placeholder:text-white/20"
                 placeholder="Tell me about your project..."
               />
             </div>
@@ -207,7 +207,7 @@ export default function Contact() {
             <button
               type="submit"
               disabled={isSubmitting || formStatus === "success"}
-              className="w-full bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 text-white font-extrabold uppercase tracking-[0.2em] text-sm py-4 rounded-xl flex items-center justify-center gap-3 transform transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none border border-white/10 shadow-lg"
             >
               {isSubmitting ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

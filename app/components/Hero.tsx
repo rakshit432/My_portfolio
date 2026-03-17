@@ -71,7 +71,7 @@ export default function Hero() {
             />
 
             {/* DESKTOP SIDEBARS - Positioned relative to the card */}
-            <div className="hidden md:flex absolute left-[105%] top-0 bottom-0 flex-row gap-4 h-full py-4 ml-2">
+            <div className="hidden lg:flex absolute left-[105%] top-0 bottom-0 flex-row gap-4 h-full py-4 ml-4">
               {/* GitHub Sidebar */}
               <a href="https://github.com/rakshit432" target="_blank" rel="noopener noreferrer" className="relative group w-12 h-full bg-white/5 border border-white/10 rounded-full flex flex-col items-center justify-start py-6 hover:bg-white/10 hover:border-white/20 transition-all">
                 <Github size={20} className="text-white/60 group-hover:text-white transition-colors" />
@@ -99,7 +99,7 @@ export default function Hero() {
           </div>
 
           {/* MOBILE LINKS */}
-          <div className="flex md:hidden gap-4 justify-center mt-8">
+          <div className="flex lg:hidden gap-4 justify-center mt-8">
             <a href="https://github.com/rakshit432" target="_blank" rel="noopener noreferrer" className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-white/60 hover:text-white">
               <Github size={20} />
             </a>
