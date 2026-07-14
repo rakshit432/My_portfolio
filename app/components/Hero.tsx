@@ -538,6 +538,7 @@ export default function HeroSection() {
     const figureScreenPos = new THREE.Vector3();
 
     function animate() {
+      if (!container) return;
       if (!inView) {
         rafId = requestAnimationFrame(animate);
         return;
