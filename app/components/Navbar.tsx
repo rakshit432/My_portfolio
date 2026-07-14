@@ -1,114 +1,145 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const NAV_ITEMS = ["Home", "About", "Experience", "Skills", "Projects", "Contact"];
+const SECTIONS = [
+  { id: "home", label: "Home" },
+  { id: "about", label: "About" },
+  { id: "experience", label: "Experience" },
+  { id: "skills", label: "Skills" },
+  { id: "projects", label: "Projects" },
+  { id: "contact", label: "Contact" },
+];
 
 export default function Navbar() {
+  const [active, setActive] = useState("home");
   const [isOpen, setIsOpen] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Monitor section scroll intersection
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setActive(e.target.id);
+          }
+        });
+      },
+      { threshold: 0.25, rootMargin: "-10% 0px -30% 0px" }
+    );
+
+    SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observerRef.current!.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  const handleNavClick = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsOpen(false);
+    
+    const lenis = (window as any).lenis;
+    if (lenis) {
+      if (id === "home") {
+        lenis.scrollTo(0, { duration: 1.2 });
+      } else {
+        const target = document.getElementById(id);
+        if (target) {
+          lenis.scrollTo(target, { duration: 1.2 });
+        }
+      }
+    } else {
+      if (id === "home") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4">
+      {/* Desktop Floating Menu */}
+      <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
         <motion.nav
-          initial={{ y: -100, opacity: 0 }}
+          initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className={`
-            relative
-            flex items-center
-            ${isOpen ? "justify-center" : "justify-between md:justify-center"}
-            w-[95%] md:w-auto
-            px-8 py-3
-            rounded-full
-            bg-black/60
-            backdrop-blur-xl
-            border border-white/[0.08]
-            ring-1 ring-white/[0.05]
-            shadow-[0_8px_30px_rgba(0,0,0,0.6)]
-            transition-all duration-300
-          `}
+          className="nav-glass px-6 py-2.5 rounded-full hidden md:flex items-center gap-1.5"
         >
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-12">
-            {NAV_ITEMS.map((item, i) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                onClick={(e) => {
-                  if (item === "Home") {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }
-                }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
-                className="
-                  text-xs uppercase tracking-widest font-semibold
-                  text-white/60
-                  transition-all duration-300
-                  hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-white hover:to-white/60
-                  hover:scale-105 cursor-pointer relative group
-                "
+          {SECTIONS.map((s) => {
+            const isActive = active === s.id;
+            return (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                onClick={(e) => handleNavClick(s.id, e)}
+                className="relative px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest text-white/50 hover:text-white transition-colors duration-300"
               >
-                {item}
-                <span className="absolute -bottom-1.5 left-0 w-0 h-[2px] bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
-              </motion.a>
-            ))}
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="flex md:hidden w-full items-center justify-between">
-            <span className="text-xs font-bold tracking-widest text-white uppercase">
-              Menu
-            </span>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-white focus:outline-none"
-            >
-              {isOpen ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg>
-              )}
-            </button>
-          </div>
+                {isActive && (
+                  <motion.span
+                    layoutId="active-pill"
+                    className="absolute inset-0 rounded-full pill-active -z-10"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                {s.label}
+              </a>
+            );
+          })}
         </motion.nav>
       </div>
 
-      {/* Mobile Full Screen Menu */}
+      {/* Mobile Sticky Menu Bar */}
+      <div className="fixed top-4 right-4 z-50 md:hidden">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-10 h-10 rounded-full nav-glass flex items-center justify-center text-white/80 hover:text-white"
+        >
+          <motion.div animate={isOpen ? "open" : "closed"} className="w-5 h-4 flex flex-col justify-between">
+            <motion.span
+              variants={{ open: { rotate: 45, y: 7 }, closed: { rotate: 0, y: 0 } }}
+              className="block h-0.5 bg-current rounded-full"
+            />
+            <motion.span
+              variants={{ open: { opacity: 0, scale: 0 }, closed: { opacity: 1, scale: 1 } }}
+              className="block h-0.5 bg-current rounded-full"
+            />
+            <motion.span
+              variants={{ open: { rotate: -45, y: -7 }, closed: { rotate: 0, y: 0 } }}
+              className="block h-0.5 bg-current rounded-full"
+            />
+          </motion.div>
+        </button>
+      </div>
+
+      {/* Mobile Drawer Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl pt-28 px-6 md:hidden"
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl flex flex-col justify-center px-8 md:hidden"
           >
-            <div className="flex flex-col items-center gap-8">
-              {NAV_ITEMS.map((item, i) => (
+            <div className="flex flex-col gap-4">
+              {SECTIONS.map((s, i) => (
                 <motion.a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  onClick={(e) => {
-                    setIsOpen(false);
-                    if (item === "Home") {
-                      e.preventDefault();
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + i * 0.1 }}
-                  className="
-                    text-4xl md:text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-white/40
-                    hover:from-indigo-400 hover:to-purple-400 hover:scale-105 transition-all duration-300
-                  "
+                  key={s.id}
+                  href={`#${s.id}`}
+                  onClick={(e) => handleNavClick(s.id, e)}
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className={`text-3xl font-extrabold uppercase tracking-tight ${
+                    active === s.id ? "text-chromatic" : "text-white/40"
+                  }`}
                 >
-                  {item}
+                  {s.label}
                 </motion.a>
               ))}
             </div>

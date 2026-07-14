@@ -1,184 +1,309 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Clock, Plus, Copy, Zap, X } from "lucide-react";
+import { useRef, useCallback, useState, useEffect } from "react";
+import { Mail, MapPin, ExternalLink, Terminal } from "lucide-react";
 
-interface ComponentProps {
-    name?: string;
-    role?: string;
-    email?: string;
-    avatarSrc?: string;
-    statusText?: string;
-    statusColor?: string;
-    glowText?: string;
-    className?: string;
+interface ProfileCardProps {
+  name: string;
+  role: string;
+  email: string;
 }
 
-export default function GlassmorphismProfileCard({
-    name = "Rakshit K.",
-    role = "Full-stack Developer",
-    email = "rakshitkumar.5905@gmail.com",
-    avatarSrc = "https://github.com/shadcn.png",
-    statusText = "Available for work",
-    statusColor = "bg-blue-500",
-    glowText = "Currently High on Creativity",
-    className,
-}: ComponentProps) {
-    const [copied, setCopied] = useState(false);
-    const [timeText, setTimeText] = useState<string>("");
-    const [isResumeOpen, setIsResumeOpen] = useState(false);
-    const [isMounted, setIsMounted] = useState(false);
+export default function GlassmorphismProfileCard({ name, role, email }: ProfileCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const reflectionRef = useRef<HTMLDivElement>(null);
+  
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timeOffset, setTimeOffset] = useState(0);
+  const [showStats, setShowStats] = useState(false);
 
-    useEffect(() => {
-        setIsMounted(true);
-        const updateTime = () => {
-            const now = new Date();
-            const h = now.getHours();
-            const m = now.getMinutes().toString().padStart(2, "0");
-            const hour12 = ((h + 11) % 12) + 1;
-            const ampm = h >= 12 ? "PM" : "AM";
-            setTimeText(`${hour12}:${m}${ampm}`);
-        };
-        
-        updateTime();
-        const interval = setInterval(updateTime, 60000);
-        return () => clearInterval(interval);
-    }, []);
+  // Audio track & time coordinates synced via custom event bus
+  const [trackInfo, setTrackInfo] = useState({ title: "Lofi Ambient 1", artist: "Helix Instruments", index: 0 });
+  const [timeInfo, setTimeInfo] = useState({ currentTime: 0, duration: 1 });
 
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(email);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-        } catch { }
+  // Sync state with global audio player events
+  useEffect(() => {
+    const handleStateChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setIsPlaying(customEvent.detail);
+    };
+    const handleTrackChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        setTrackInfo(customEvent.detail);
+      }
+    };
+    const handleTimeChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        setTimeInfo(customEvent.detail);
+      }
     };
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className={cn("relative w-full max-w-sm mx-auto", className)}
-        >
+    window.addEventListener("audioPlayState", handleStateChange);
+    window.addEventListener("audioTrackChange", handleTrackChange);
+    window.addEventListener("audioTimeUpdate", handleTimeChange);
 
-            {/* Glowing Accent Background */}
-            <div className="pointer-events-none absolute inset-x-3 -bottom-10 top-[85%] rounded-[28px] bg-gradient-to-r from-blue-500/80 via-indigo-500/80 to-purple-500/80 blur-xl shadow-[0_40px_80px_-16px_rgba(99,102,241,0.5)] z-0 transition-all duration-700 ease-in-out group-hover:blur-2xl" />
+    return () => {
+      window.removeEventListener("audioPlayState", handleStateChange);
+      window.removeEventListener("audioTrackChange", handleTrackChange);
+      window.removeEventListener("audioTimeUpdate", handleTimeChange);
+    };
+  }, []);
+
+  // requestAnimationFrame loop to tick wave coordinates
+  useEffect(() => {
+    let reqId: number;
+    const tick = () => {
+      setTimeOffset((prev) => prev + (isPlaying ? 0.22 : 0.035));
+      reqId = requestAnimationFrame(tick);
+    };
+    reqId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(reqId);
+  }, [isPlaying]);
+
+  const toggleStats = useCallback(() => {
+    // Play digital console selector chime (Web Audio)
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    } catch(e) {}
+    
+    setShowStats((prev) => !prev);
+  }, []);
+
+  // Mouse tilt tracking handlers
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    const reflection = reflectionRef.current;
+    if (!card || !reflection) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const percentX = (x / rect.width - 0.5) * 12; 
+    const percentY = (y / rect.height - 0.5) * -12;
+
+    card.style.transition = "none";
+    card.style.transform = `perspective(1000px) rotateY(${percentX}deg) rotateX(${percentY}deg) scale3d(1.02, 1.02, 1.02)`;
+    
+    reflection.style.setProperty("--x", `${x}px`);
+    reflection.style.setProperty("--y", `${y}px`);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.transition = "transform 0.5s var(--ease-fluid)";
+    card.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg) scale3d(1, 1, 1)`;
+  }, []);
+
+  // Compute live Green Oscilloscope SVG path coordinates
+  const points: string[] = [];
+  const width = 160;
+  for (let x = 0; x <= width; x += 4) {
+    const amplitude = isPlaying ? 14 : 2;
+    const frequency = isPlaying ? 0.09 : 0.03;
+    const yVal = 40 + Math.sin(x * frequency + timeOffset) * amplitude;
+    points.push(`${x === 0 ? "M" : "L"} ${x} ${yVal}`);
+  }
+  const pathData = points.join(" ");
+
+  // Progress percentage
+  const progressPercent = (timeInfo.currentTime / timeInfo.duration) * 100;
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="border-beam-wrapper w-[92vw] max-w-[480px] aspect-[1.55/1] cursor-pointer"
+      style={{ transition: "transform 0.4s var(--ease-fluid)" }}
+    >
+      <div className="border-beam-inner glass-card p-6 w-full h-full flex flex-col justify-between select-none relative bg-[#0c0c14] border-2 border-white/10 rounded-[2rem] shadow-2xl">
+        {/* Corner Screws */}
+        <span className="rack-mount-screw absolute top-3 left-3 opacity-30" />
+        <span className="rack-mount-screw absolute top-3 right-3 opacity-30" />
+        <span className="rack-mount-screw absolute bottom-3 left-3 opacity-30" />
+        <span className="rack-mount-screw absolute bottom-3 right-3 opacity-30" />
+
+        <div ref={reflectionRef} className="glass-reflection" />
+
+        {/* Modular panel header */}
+        <div className="relative z-10 flex items-center justify-between text-[8px] font-mono text-white/30 tracking-widest uppercase">
+          <span>EURORACK OSCILLATOR MODEL-R</span>
+          <div className="flex items-center gap-1">
+            <span className={`w-1.5 h-1.5 rounded-full ${isPlaying ? "bg-[#22d3ee] animate-pulse" : "bg-neutral-600"}`} />
+            <span className="text-[#22d3ee]">SYS CORE ACTIVE</span>
+          </div>
+        </div>
+
+        {/* Chassis Center Panel */}
+        <div className="relative z-10 flex items-stretch gap-4 my-2 flex-1">
+          
+          {/* Left Block: Glowing Oscilloscope Screen */}
+          <div className="w-[52%] bg-[#081311] border-2 border-neutral-850 rounded-xl relative overflow-hidden flex flex-col justify-between p-2.5 shadow-[inset_0_2px_10px_rgba(0,0,0,0.9)] text-[#4ade80] font-mono select-none">
+            {/* Grid overlay */}
+            <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" 
+                 style={{ 
+                   backgroundImage: "linear-gradient(to right, #4ade80 1px, transparent 1px), linear-gradient(to bottom, #4ade80 1px, transparent 1px)",
+                   backgroundSize: "16px 16px"
+                 }} 
+            />
             
-            <div className="absolute inset-x-0 -bottom-10 mx-auto w-full z-0 pointer-events-none">
-                <div className="flex items-center justify-center gap-2 bg-transparent py-3 text-center text-sm font-semibold text-white/90 tracking-wide drop-shadow-md">
-                    <Zap className="h-4 w-4 text-yellow-400" /> {glowText}
+            {showStats ? (
+              <div className="relative z-10 flex flex-col justify-between h-full text-[7.5px] leading-tight space-y-0.5 mt-0.5 text-left">
+                <div className="text-[8px] border-b border-[#4ade80]/20 pb-0.5 mb-1 flex justify-between font-bold text-[#ccfbf1]">
+                  <span>DIAGNOSTIC DATA</span>
+                  <span className="animate-pulse">●</span>
                 </div>
+                <div className="flex justify-between"><span>EDUCATION:</span> <span className="font-bold text-[#ccfbf1]">B.TECH CSE</span></div>
+                <div className="flex justify-between"><span>LEETCODE RAT:</span> <span className="font-bold text-[#ccfbf1]">1700+</span></div>
+                <div className="flex justify-between"><span>SOLVED PROBS:</span> <span className="font-bold text-[#ccfbf1]">800+</span></div>
+                <div className="flex justify-between"><span>COMMITS:</span> <span className="font-bold text-[#ccfbf1]">1.2K+</span></div>
+                <div className="flex justify-between"><span>ROLE FOCUS:</span> <span className="font-bold text-[#ccfbf1]">SOFTWARE ENG</span></div>
+              </div>
+            ) : (
+              <>
+                <svg viewBox="0 0 160 80" className="w-full h-full text-[#4ade80] relative z-10">
+                  <path 
+                    d={pathData} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    className="drop-shadow-[0_0_4px_rgba(74,222,128,0.7)]"
+                  />
+                </svg>
+                
+                {/* Track progress HUD overlay */}
+                <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between text-[5.5px] text-[#4ade80]/60 z-10 bg-[#081311]/85 px-1 py-0.5 rounded border border-[#4ade80]/15">
+                  <span className="truncate max-w-[50px] uppercase font-bold text-[#ccfbf1] tracking-wider">{trackInfo.title}</span>
+                  <span className="font-mono">
+                    {Math.floor(timeInfo.currentTime / 60)}:{(Math.floor(timeInfo.currentTime % 60)).toString().padStart(2, '0')}
+                  </span>
+                </div>
+                
+                {/* Scrubber indicator line */}
+                <div 
+                  className="absolute bottom-0 left-0 h-0.5 bg-[#4ade80] transition-all duration-300 shadow-[0_0_4px_#4ade80]" 
+                  style={{ width: `${progressPercent}%` }} 
+                />
+              </>
+            )}
+          </div>
+
+          {/* Right Block: Synth Knobs & Sockets */}
+          <div className="flex-1 flex flex-col justify-between py-1 px-1 border-l border-white/5">
+            {/* Toggle telemetry mode */}
+            <div className="my-0.5 select-none relative z-20">
+              <button 
+                onClick={toggleStats}
+                className="w-full px-1.5 py-1 border border-[#22d3ee]/20 text-[#22d3ee] rounded bg-white/5 font-mono text-[7px] cursor-pointer hover:bg-[#22d3ee]/10 active:scale-95 transition-all text-center leading-none font-bold"
+              >
+                {showStats ? "OSCILLOSCOPE" : "TELEMETRY"}
+              </button>
             </div>
 
-            <Card className={cn(
-                "group relative z-10 mx-auto w-full max-w-[90vw] sm:max-w-3xl overflow-visible rounded-[24px]",
-                "bg-white/5 backdrop-blur-2xl dark:bg-black/20",
-                "border border-white/10 dark:border-white/5",
-                "shadow-2xl shadow-black/40 text-white transition-all duration-500 hover:shadow-indigo-500/20 hover:border-white/20 hover:-translate-y-1"
-            )}>
-                <CardContent className="p-6 sm:p-8">
-                    <div className="mb-8 flex items-center justify-between text-sm text-neutral-300">
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 backdrop-blur-md">
-                            <span className={cn("inline-block h-2 w-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]", statusColor)} />
-                            <span className="select-none font-medium text-xs tracking-wider uppercase opacity-90">{statusText}</span>
-                        </div>
-                        <div className="flex items-center gap-2 opacity-70 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 backdrop-blur-md">
-                            <Clock className="h-3.5 w-3.5" />
-                            <span className="tabular-nums text-xs font-mono">{timeText || "--:--"}</span>
-                        </div>
-                    </div>
+            {/* Rotary dial knobs */}
+            <div className="grid grid-cols-3 gap-1">
+              <div className="flex flex-col items-center group">
+                <div className="w-6 h-6 rounded-full border border-neutral-750 bg-neutral-900 relative flex items-center justify-center group-hover:rotate-45 transition-transform duration-300">
+                  <div className="w-0.5 h-2 bg-[#22d3ee] absolute top-0.5 rounded-full" />
+                </div>
+                <span className="font-mono text-[5px] text-[#22d3ee]/80 mt-1">VOL</span>
+              </div>
+              <div className="flex flex-col items-center group">
+                <div className="w-6 h-6 rounded-full border border-neutral-750 bg-neutral-900 relative flex items-center justify-center group-hover:-rotate-45 transition-transform duration-300">
+                  <div className="w-0.5 h-2 bg-[#c084fc] absolute top-0.5 rounded-full" />
+                </div>
+                <span className="font-mono text-[5px] text-[#c084fc]/80 mt-1">BAL</span>
+              </div>
+              <div className="flex flex-col items-center group">
+                <div className="w-6 h-6 rounded-full border border-neutral-750 bg-neutral-900 relative flex items-center justify-center group-hover:rotate-90 transition-transform duration-300">
+                  <div className="w-0.5 h-2 bg-[#f472b6] absolute top-0.5 rounded-full" />
+                </div>
+                <span className="font-mono text-[5px] text-[#f472b6]/80 mt-1">GAIN</span>
+              </div>
+            </div>
 
+            {/* Sockets re-imagined as physical play controls */}
+            <div className="flex justify-around items-center mt-1 border-t border-white/5 pt-2 select-none relative z-20">
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent("toggleAudioPlay"))}
+                  className="w-5.5 h-5.5 rounded-full bg-black border-2 border-[#22d3ee] flex items-center justify-center hover:bg-[#22d3ee]/10 active:scale-90 transition-all cursor-pointer"
+                  title="Play / Pause"
+                >
+                  {isPlaying ? (
+                    <div className="w-1.5 h-1.5 bg-[#22d3ee] rounded-sm" />
+                  ) : (
+                    <div className="w-0 h-0 border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent border-l-[5px] border-l-[#22d3ee] ml-0.5" />
+                  )}
+                </button>
+                <span className="font-mono text-[5px] text-white/30 mt-0.5">PLAY</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent("nextAudioTrack"))}
+                  className="w-5.5 h-5.5 rounded-full bg-black border-2 border-[#c084fc] flex items-center justify-center hover:bg-[#c084fc]/10 active:scale-90 transition-all cursor-pointer"
+                  title="Next Track"
+                >
+                  <div className="w-1.5 h-1.5 bg-[#c084fc] rounded-full" />
+                </button>
+                <span className="font-mono text-[5px] text-white/30 mt-0.5">NEXT</span>
+              </div>
+            </div>
+          </div>
 
-                    <div className="flex flex-col justify-center items-center gap-5 relative z-10">
-                        <div className="relative h-32 w-32 sm:h-40 sm:w-40 shrink-0 overflow-hidden rounded-full ring-4 ring-white/10 shadow-2xl transition-transform duration-500 ease-out group-hover:scale-105 group-hover:ring-white/20">
-                            <Image
-                                src={avatarSrc}
-                                alt={`${name} avatar`}
-                                fill
-                                sizes="(max-width: 640px) 128px, 160px"
-                                className="object-cover transition-transform duration-700 hover:scale-110"
-                            />
-                        </div>
-                        <div className="min-w-0 text-center">
-                            <h3 className="truncate text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white to-white/70">
-                                {name}
-                            </h3>
-                            <p className="mt-1.5 text-sm font-medium text-indigo-200/80 uppercase tracking-widest">{role}</p>
-                        </div>
-                    </div>
+        </div>
 
+        {/* Metadata display */}
+        <div className="relative z-10 flex items-center justify-between border-t border-white/5 pt-3">
+          <div>
+            <h2 className="text-sm font-black tracking-tight text-white font-mono uppercase leading-none">
+              {name}
+            </h2>
+            <span className="font-mono text-[8px] text-white/40 block mt-0.5">
+              {role}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <MapPin size={9} className="text-[#f472b6]" />
+            <span className="font-mono text-[8px] text-white/40 uppercase">BIT MESRA, IN</span>
+          </div>
+        </div>
 
-                    <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsResumeOpen(true)}
-                            className="h-12 justify-center gap-2 sm:gap-3 rounded-xl bg-white/5 border-white/10 text-white hover:bg-white/15 hover:text-white hover:scale-[1.02] transition-all duration-300 shadow-md backdrop-blur-md font-bold uppercase tracking-wider text-xs"
-                        >
-                            <Plus className="h-4 w-4" /> View Resume
-                        </Button>
+        {/* Footer links */}
+        <div className="relative z-10 flex items-center justify-between text-[9px] text-white/40 pt-2 border-t border-dashed border-white/5 select-none">
+          <a
+            href={`mailto:${email}`}
+            className="flex items-center gap-1 hover:text-[#22d3ee] transition-colors relative z-20 font-mono text-[8px]"
+          >
+            <Mail size={9} />
+            <span>{email}</span>
+          </a>
+          <button
+            onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+            className="flex items-center gap-1 hover:text-[#c084fc] transition-colors cursor-pointer relative z-20 font-mono text-[8px]"
+          >
+            <span>Console Patch</span>
+            <ExternalLink size={9} />
+          </button>
+        </div>
 
-                        <Button
-                            variant="outline"
-                            onClick={handleCopy}
-                            className="h-12 justify-center gap-2 sm:gap-3 rounded-xl bg-white/5 border-white/10 text-white hover:bg-white/15 hover:text-white hover:scale-[1.02] transition-all duration-300 shadow-md backdrop-blur-md"
-                        >
-                            <Copy className="h-4 w-4" /> {copied ? "Copied" : "Copy Email"}
-                        </Button>
-                    </div>
-                </CardContent>
-                
-                {/* Subtle gradient overlay on hover */}
-                <div className="absolute inset-0 rounded-[24px] bg-gradient-to-tr from-white/0 via-white/0 to-white/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none" />
-            </Card>
-
-            {/* Resume Overlay Modal */}
-            {isMounted && document.body && createPortal(
-                <AnimatePresence>
-                    {isResumeOpen && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 md:p-12 bg-black/80 backdrop-blur-xl"
-                        >
-                            <motion.div
-                                initial={{ scale: 0.95, opacity: 0, y: 20 }}
-                                animate={{ scale: 1, opacity: 1, y: 0 }}
-                                exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                                className="relative w-full max-w-5xl h-full max-h-[90vh] bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden flex flex-col"
-                            >
-                                {/* Header */}
-                                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-900/50">
-                                    <h3 className="text-white font-bold uppercase tracking-widest text-sm">Resume Document</h3>
-                                    <button 
-                                        onClick={() => setIsResumeOpen(false)}
-                                        className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
-                                    >
-                                        <X className="w-5 h-5" />
-                                    </button>
-                                </div>
-                                
-                                {/* Iframe */}
-                                <div className="flex-1 w-full bg-black">
-                                    <iframe 
-                                        src="https://drive.google.com/file/d/1IoUhKAVlPbzbz6a5f11LoJJS9zq32HAh/preview" 
-                                        className="w-full h-full border-none"
-                                        allow="autoplay"
-                                    ></iframe>
-                                </div>
-                            </motion.div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>,
-                document.body
-            )}
-        </motion.div>
-    );
+      </div>
+    </div>
+  );
 }

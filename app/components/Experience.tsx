@@ -1,178 +1,278 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, memo, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { Briefcase, Calendar, GraduationCap, MapPin, CheckCircle2 } from "lucide-react";
 
-const EXPERIENCE = [
-    {
-        id: 1,
-        role: "Web Lead",
-        company: "NSS BIT Mesra",
-        period: "2023 - Present",
-        description: "Managed and led the development of the official NSS BIT Mesra government website. Mentored a team of developers to build impactful digital solutions for social causes.",
-        tech: ["Leadership", "Govt Project", "Full Stack Dev"],
-    },
-    {
-        id: 2,
-        role: "Freelance Full Stack Developer",
-        company: "Smart Choice Homes",
-        period: "2024",
-        description: "Designed and created the full frontend for a premium real estate platform. Developed a comprehensive Admin Dashboard to manage listings and streamline operations.",
-        tech: ["Next.js", "Admin Dashboard", "Tailwind CSS"],
-    },
+interface TimelineItem {
+  id: string;
+  type: "work" | "edu";
+  role: string;
+  company: string;
+  period: string;
+  desc: string;
+  tech: string[];
+  color: string;
+  glow: string;
+  metrics: string[];
+}
+
+const ITEMS: TimelineItem[] = [
+  {
+    id: "research_intern",
+    type: "work",
+    role: "Research Intern",
+    company: "Birla Institute of Technology, Mesra",
+    period: "2026",
+    desc: "Conducted machine learning research to predict the Remaining Useful Life (RUL) of bearings. Developed deep learning architectures (LSTMs and CNNs) to analyze time-series vibration datasets for prognostics and health management.",
+    tech: ["Python", "Deep Learning", "LSTMs/CNNs", "Time-Series Analysis", "Predictive Maintenance"],
+    color: "#7C3AED",
+    glow: "rgba(124, 58, 237, 0.25)",
+    metrics: ["Focus: RUL Prediction", "Data: Vibration Signals", "Models: DL Architectures"],
+  },
+  {
+    id: "nss",
+    type: "work",
+    role: "Cyber & Web Lead",
+    company: "NSS Executive Body, BIT Mesra",
+    period: "Sept 2023 – Present",
+    desc: "Led a team of 6 developers building official web modules, event dashboards, and digital verification systems. Architected Next.js frontends and RESTful APIs for real-world deployment serving 3,000+ student verifications.",
+    tech: ["Next.js", "React.js", "REST APIs", "Web Architecture", "Dashboard UI"],
+    color: "#C4183C",
+    glow: "rgba(196, 24, 60, 0.25)",
+    metrics: ["Team: 6 Devs", "Verifications: 3K+", "Event Reach: +35%"],
+  },
+  {
+    id: "bit",
+    type: "edu",
+    role: "B.Tech in Computer Science & Engineering",
+    company: "Birla Institute of Technology, Mesra",
+    period: "Sept 2023 – Present",
+    desc: "Core coursework: Data Structures & Algorithms, Operating Systems, DBMS, Object-Oriented Programming, Computer Networks, and Web Engineering. Active problem-solver across competitive programming platforms.",
+    tech: ["Java / C++", "DSA & Algorithms", "DBMS & SQL", "Operating Systems", "OOP"],
+    color: "#C4183C",
+    glow: "rgba(196, 24, 60, 0.25)",
+    metrics: ["800+ DSA Problems solved", "Focus: CSE / Web Architecture", "Status: Active student"],
+  },
 ];
 
-const EDUCATION = [
-    {
-        id: 1,
-        degree: "Bachelor of Technology in Computer Science",
-        institution: "Birla Institute of Technology, Mesra",
-        period: "2023 - 2027",
-        description: "Focusing on Software Engineering, Data Structures, and Algorithms."
-    }
-]
+// Alternate sliding card component — memoized
+const TimelineCard = memo(function TimelineCard({
+  item,
+  index,
+}: {
+  item: TimelineItem;
+  index: number;
+}) {
+  const isEven = index % 2 === 0;
+  const Icon = item.type === "work" ? Briefcase : GraduationCap;
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div className={`relative flex flex-col md:flex-row items-center justify-between w-full mb-16 ${
+      isEven ? "md:flex-row-reverse" : ""
+    }`}>
+      {/* Spacer to push card to correct side */}
+      <div className="w-full md:w-[45%] hidden md:block" />
+
+      {/* Dynamic chrome selector knob indicator */}
+      <div className="absolute left-9 md:left-1/2 top-0 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 flex items-center justify-center z-20">
+        <motion.div
+          initial={{ scale: 0 }}
+          whileInView={{ scale: 1 }}
+          viewport={{ once: true }}
+          className="w-10 h-10 knob-dial flex items-center justify-center cursor-pointer"
+          style={{ 
+            borderColor: item.color, 
+            boxShadow: `0 0 15px ${item.glow}`,
+            transform: isHovered ? "rotate(45deg)" : "rotate(0deg)",
+            transition: "transform 0.4s ease"
+          }}
+        >
+          {/* Subtle pointer indicator is created via CSS .knob-dial::after */}
+        </motion.div>
+      </div>
+
+      {/* Floating Glassmorphism Timeline Card */}
+      <motion.div
+        initial={{ opacity: 0, x: isEven ? 40 : -40 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full md:w-[45%] pl-12 md:pl-0"
+      >
+        <div 
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="glass-card p-6 md:p-8 hover:scale-[1.02] transition-all duration-300 group overflow-hidden cursor-pointer relative bg-black/40 border border-white/5 rounded-2xl"
+          style={{
+            borderColor: isHovered ? item.color : "var(--glass-border)",
+            boxShadow: isHovered ? `0 10px 30px ${item.glow}` : "0 12px 40px var(--glass-shadow)"
+          }}
+        >
+          {/* Studio screws */}
+          <span className="rack-mount-screw absolute top-3 left-3 opacity-30" />
+          <span className="rack-mount-screw absolute top-3 right-3 opacity-30" />
+
+          {/* Blueprint grid layout overlay */}
+          <div className="blueprint-grid" style={{ opacity: isHovered ? 0.35 : 0 }} />
+
+          {/* Dotted texture mesh */}
+          <div className="tech-dot-mesh" />
+
+          <div
+            className="absolute -right-24 -top-24 w-60 h-60 rounded-full blur-3xl opacity-10 pointer-events-none"
+            style={{ background: item.color }}
+          />
+
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-white/40 block">
+                {item.type === "work" ? "CLASSIFIED WORK LOG" : "CLASSIFIED EDUCATION LOG"}
+              </span>
+              <h3 className="text-xl font-bold text-white tracking-tight mt-1 font-mono uppercase">
+                {item.role}
+              </h3>
+              <span className="text-sm text-white/50">@ {item.company}</span>
+            </div>
+            <span
+              className="px-3.5 py-1.5 rounded-xl text-[10px] font-mono border"
+              style={{
+                borderColor: `${item.color}30`,
+                color: item.color,
+                background: `${item.color}08`,
+              }}
+            >
+              {item.period}
+            </span>
+          </div>
+
+          <p className="relative z-10 text-sm text-white/60 leading-relaxed">{item.desc}</p>
+
+          <div className="relative z-10 flex flex-wrap gap-1.5 mt-5">
+            {item.tech.map((t) => (
+              <span
+                key={t}
+                className="px-2.5 py-1 rounded-lg text-[10px] font-semibold text-white/40 border border-white/5 bg-white/2"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          {/* Expandable Blueprint Metrics Drawer */}
+          <div className="relative z-10 mt-5 pt-4 border-t border-white/5 overflow-hidden max-h-0 opacity-0 group-hover:max-h-20 group-hover:opacity-100 transition-all duration-500 ease-out">
+            <span className="font-mono text-[9px] uppercase tracking-wider text-white/30 block mb-2">Metrics & Deliverables</span>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {item.metrics.map((m) => (
+                <div key={m} className="flex items-center gap-1 font-mono text-[9px] text-[#4ade80]">
+                  <CheckCircle2 size={10} className="text-[#4ade80] shrink-0" />
+                  <span>{m}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </motion.div>
+    </div>
+  );
+});
 
 export default function Experience() {
-    const containerRef = useRef<HTMLElement>(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start end", "end start"]
-    });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isUpsideDown, setIsUpsideDown] = useState(false);
 
-    // Parallax for header
-    const yHeader = useTransform(scrollYProgress, [0, 1], [50, -50]);
-    const opacityHeader = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  useEffect(() => {
+    const handleDimensionChange = (e: Event) => {
+      setIsUpsideDown((e as CustomEvent).detail);
+    };
+    window.addEventListener("dimensionShiftState", handleDimensionChange);
+    if (document.body.classList.contains("alternate-dimension")) {
+      setIsUpsideDown(true);
+    }
+    return () => window.removeEventListener("dimensionShiftState", handleDimensionChange);
+  }, []);
 
-    // Timeline progress
-    const scaleY = useSpring(useTransform(scrollYProgress, [0, 0.5], [0, 1]), {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
+  // Track vertical page scroll intersection for line progress
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"],
+  });
 
-    return (
-        <section ref={containerRef} id="experience" className="py-32 px-6 relative z-10 overflow-hidden">
+  const springScale = useSpring(scrollYProgress, {
+    stiffness: 70,
+    damping: 18,
+    restDelta: 0.001,
+  });
 
-            {/* Parallax Background Element */}
-            <motion.div
-                style={{ y: useTransform(scrollYProgress, [0, 1], [-100, 100]), opacity: 0.1 }}
-                className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600 rounded-full blur-[150px] -z-10 pointer-events-none"
-            />
+  const pipelineHeight = useTransform(springScale, [0, 1], ["0%", "100%"]);
 
-            <div className="max-w-4xl mx-auto space-y-16">
+  return (
+    <section
+      ref={containerRef}
+      id="experience"
+      className="py-24 px-6 md:px-12 relative z-10 max-w-6xl mx-auto overflow-hidden"
+    >
+      {/* Tape Reels Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 select-none opacity-[0.03]">
+        <svg className="absolute -left-20 top-20 w-80 h-80 animate-[spin_40s_linear_infinite]" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" stroke="white" strokeWidth="1" fill="none" strokeDasharray="5, 5" />
+          <circle cx="50" cy="50" r="20" stroke="white" strokeWidth="2" fill="none" />
+          <line x1="50" y1="10" x2="50" y2="90" stroke="white" strokeWidth="1" />
+          <line x1="10" y1="50" x2="90" y2="50" stroke="white" strokeWidth="1" />
+        </svg>
+        <svg className="absolute -right-20 bottom-20 w-96 h-96 animate-[spin_55s_linear_infinite_reverse]" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" stroke="white" strokeWidth="1.5" fill="none" strokeDasharray="8, 4" />
+          <circle cx="50" cy="50" r="15" stroke="white" strokeWidth="2" fill="none" />
+          <line x1="50" y1="5" x2="50" y2="95" stroke="white" strokeWidth="1" />
+          <line x1="5" y1="50" x2="95" y2="50" stroke="white" strokeWidth="1" />
+        </svg>
+      </div>
 
-                {/* Header with Parallax */}
-                <motion.div
-                    style={{ y: yHeader, opacity: opacityHeader }}
-                    className="space-y-6 text-center md:text-left pt-12"
-                >
-                    <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-4 uppercase text-transparent bg-clip-text bg-gradient-to-br from-white via-neutral-200 to-neutral-600 drop-shadow-sm">
-                        Journey
-                    </h2>
-                    <p className="text-indigo-200/70 max-w-lg leading-relaxed text-xl font-medium tracking-wide pl-1">
-                        My academic and professional evolution.
-                    </p>
-                </motion.div>
+      {/* Background blobs */}
+      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-[#7C3AED]/5 blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] rounded-full bg-[#C4183C]/5 blur-[120px] pointer-events-none -z-10" />
 
-                <div className="relative ml-1 md:ml-6 space-y-20 pl-8 md:pl-16 pb-12">
+      {/* Header */}
+      <div className="mb-20 text-center">
+        <span className="font-mono text-xs uppercase tracking-widest text-[#C4183C] block mb-3">
+          &gt; career.log
+        </span>
+        <h2 className="text-4xl md:text-5xl font-extrabold uppercase tracking-tight leading-tight select-text text-transparent bg-clip-text bg-gradient-to-r from-[#F1EDE4] via-[#C4183C] to-[#7C3AED]" style={{ fontFamily: "'Unbounded', sans-serif" }}>
+          Work &amp; <span className="text-[#C4183C]">Education</span>
+        </h2>
+        <p className="text-sm text-[#8B8698] mt-4 leading-relaxed max-w-xs mx-auto">
+          Technical roles, academic milestones, and the progression that led to 5 live projects.
+        </p>
+      </div>
 
-                    {/* Background Line (Faint) */}
-                    <div className="absolute left-0 top-0 bottom-0 w-px bg-white/5" />
+      {/* Timeline Track */}
+      <div className="relative w-full mt-12 pb-10">
+        
+        {/* Continuous magnetic recording tape ribbon */}
+        <div className="magnetic-tape-ribbon left-9 md:left-1/2" />
+        
+        {/* Glowing record head path overlay */}
+        <div className="absolute left-9 md:left-1/2 top-0 bottom-0 w-[2px] bg-white/5 -translate-x-1/2 z-10">
+          <motion.div
+            style={{ height: pipelineHeight }}
+            className={`w-full ${
+              isUpsideDown 
+                ? "bg-gradient-to-b from-[#C4183C] via-[#7C3AED] to-[#800c22] shadow-[0_0_15px_#C4183C]" 
+                : "bg-gradient-to-b from-[#C4183C] via-[#7C3AED] to-[#7C3AED] shadow-[0_0_10px_rgba(124,58,237,0.4)]"
+            }`}
+          />
+        </div>
 
-                    {/* Active Progress Line (Scroll Linked) */}
-                    <motion.div
-                        style={{ scaleY, originY: 0 }}
-                        className="absolute left-[0px] md:left-[0px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-500 via-indigo-500 to-purple-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.6)]"
-                    />
+        {/* Alternate cards list */}
+        <div className="space-y-6">
+          {ITEMS.map((item, idx) => (
+            <TimelineCard key={item.id} item={item} index={idx} />
+          ))}
+        </div>
 
-                    {/* Experience Items */}
-                    {EXPERIENCE.map((item, index) => (
-                        <motion.div
-                            key={item.id}
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true, margin: "-100px" }}
-                            transition={{ duration: 0.8, delay: index * 0.1 }}
-                            className="relative mb-12"
-                        >
-                            {/* Dot */}
-                            <div className="absolute -left-[42px] md:-left-[74px] top-2 w-6 h-6 rounded-full bg-black border-[2px] border-white/10 group-hover:border-indigo-400/50 flex items-center justify-center z-10 transition-colors duration-500 shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]">
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    whileInView={{ scale: 1 }}
-                                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                    className="w-2.5 h-2.5 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 group-hover:from-white group-hover:to-white transition-colors duration-300"
-                                />
-                            </div>
-
-                            <div className="space-y-4 group cursor-default bg-white/[0.01] p-6 rounded-3xl border border-transparent hover:border-white/10 hover:bg-white/[0.03] transition-all duration-500 hover:-translate-y-1">
-                                <span className="inline-block px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-bold tracking-[0.2em] text-indigo-300 uppercase shadow-inner">
-                                    {item.period}
-                                </span>
-                                <h3 className="text-2xl md:text-3xl font-extrabold text-white/90 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-300 group-hover:to-purple-300 transition-all duration-300">
-                                    {item.role} <span className="text-white/20 group-hover:text-white/40 font-light mx-2">@</span> {item.company}
-                                </h3>
-                                <p className="text-indigo-100/60 leading-relaxed max-w-2xl text-[1.1rem] group-hover:text-white/80 transition-colors duration-300 gap-2">
-                                    {item.description}
-                                </p>
-                                <div className="flex flex-wrap gap-3 pt-3">
-                                    {item.tech.map(t => (
-                                        <span key={t} className="px-3 py-1 rounded-full text-[10px] uppercase tracking-wider bg-white/5 text-white/50 border border-white/5 group-hover:border-white/10 group-hover:bg-white/10 transition-colors">
-                                            {t}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-
-                    {/* Separator */}
-                    <div className="py-12 flex items-center gap-4 ml-[-33px] md:ml-[-65px] pl-8">
-                        <div className="h-px w-8 bg-gradient-to-r from-transparent to-white/20" />
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.4em] bg-white/5 px-4 py-1.5 rounded-full border border-white/10 shadow-sm backdrop-blur-sm">Education</span>
-                        <div className="h-px w-8 bg-gradient-to-l from-transparent to-white/20" />
-                    </div>
-
-                    {/* Education Items */}
-                    {EDUCATION.map((item) => (
-                        <motion.div
-                            key={item.id}
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true, margin: "-100px" }}
-                            transition={{ duration: 0.8 }}
-                            className="relative mb-12"
-                        >
-                            {/* Dot */}
-                            <div className="absolute -left-[42px] md:-left-[74px] top-2 w-6 h-6 rounded-full bg-black border-[2px] border-white/10 group-hover:border-purple-400/50 flex items-center justify-center z-10 transition-colors duration-500 shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    whileInView={{ scale: 1 }}
-                                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                                    className="w-2.5 h-2.5 rounded-full bg-neutral-400 group-hover:bg-white transition-colors duration-300 shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                                />
-                            </div>
-
-                            <div className="space-y-4 group cursor-default bg-white/[0.01] p-6 rounded-3xl border border-transparent hover:border-white/10 hover:bg-white/[0.03] transition-all duration-500 hover:-translate-y-1">
-                                <span className="inline-block px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-bold tracking-[0.2em] text-purple-300 uppercase shadow-inner">
-                                    {item.period}
-                                </span>
-                                <h3 className="text-2xl md:text-3xl font-extrabold text-white/90 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-300 group-hover:to-pink-300 transition-all duration-300">
-                                    {item.institution}
-                                </h3>
-                                <p className="text-white/80 font-semibold text-[1.1rem] group-hover:text-white transition-colors duration-300">
-                                    {item.degree}
-                                </p>
-                                <p className="text-indigo-100/60 leading-relaxed max-w-2xl group-hover:text-white/80 transition-colors duration-300 gap-2">
-                                    {item.description}
-                                </p>
-                            </div>
-                        </motion.div>
-                    ))}
-
-                </div>
-
-            </div>
-        </section>
-    );
+      </div>
+    </section>
+  );
 }
