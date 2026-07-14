@@ -152,7 +152,7 @@ export function AsciiArtVisualizer({
             // Noise-like flicker based on time, row, and column index
             const noise = Math.sin(time + r * 0.15 + c * 0.08) * Math.cos(time * 0.7 - r * 0.05);
             if (noise > 0.4) {
-              flicker = 1.0 - settings.animIntensity.intensity * 0.01 * Math.random();
+              flicker = 1.0 - settings.animIntensity * Math.random();
             }
           }
 
