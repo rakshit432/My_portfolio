@@ -4,6 +4,8 @@ import { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+const LineComponent = "line" as any;
+
 function SynthHardware() {
   const groupRef = useRef<THREE.Group>(null!);
   const waveRef = useRef<THREE.Line>(null!);
@@ -99,9 +101,9 @@ function SynthHardware() {
       </mesh>
 
       {/* Oscilloscope Green Line Waveform */}
-      <line ref={waveRef as any} geometry={lineGeometry} position={[0, 0.55, 0.02]}>
+      <LineComponent ref={waveRef} geometry={lineGeometry} position={[0, 0.55, 0.02]}>
         <lineBasicMaterial color="#34d399" linewidth={2} />
-      </line>
+      </LineComponent>
 
       {/* Knob 1 (Left - Frequency Fader) */}
       <group position={[-0.38, -0.15, 0.06]}>

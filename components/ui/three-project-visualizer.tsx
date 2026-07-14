@@ -4,6 +4,8 @@ import { useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+const LineComponent = "line" as any;
+
 // ─── SHARED PULSE HOOK ───────────────────────────────────────────────────────
 function usePianoImpulse() {
   const scaleRef = useRef(1.0);
@@ -112,9 +114,9 @@ function PanelLine({ from, to }: { from: [number,number,number]; to: [number,num
   }, [points]);
 
   return (
-    <line geometry={lineGeo} ref={ref as any}>
+    <LineComponent geometry={lineGeo} ref={ref}>
       <lineBasicMaterial color="#7c3aed" transparent opacity={0.3} />
-    </line>
+    </LineComponent>
   );
 }
 

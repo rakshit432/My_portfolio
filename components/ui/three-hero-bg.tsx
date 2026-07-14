@@ -4,6 +4,8 @@ import { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+const LineComponent = "line" as any;
+
 function MorphingBlob({ color, position, scale, speed }: { color: string; position: [number, number, number]; scale: [number, number, number]; speed: number }) {
   const meshRef = useRef<THREE.Mesh>(null!);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -100,9 +102,9 @@ function AnalogWaveLine({ color, speed, amplitude, yOffset, opacity }: { color: 
   });
 
   return (
-    <line ref={lineRef as any} geometry={geometry} visible={scrollOpacity > 0}>
+    <LineComponent ref={lineRef} geometry={geometry} visible={scrollOpacity > 0}>
       <lineBasicMaterial color={color} transparent opacity={opacity * scrollOpacity} linewidth={1.5} />
-    </line>
+    </LineComponent>
   );
 }
 
