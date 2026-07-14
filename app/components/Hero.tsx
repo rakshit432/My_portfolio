@@ -609,8 +609,10 @@ export default function HeroSection() {
       const fogColorNormal = new THREE.Color(0x0a0812);
       const fogColorUD = new THREE.Color(0x070104);
       const currentFogColor = fogColorNormal.clone().lerp(fogColorUD, progress);
-      scene.fog.color.copy(currentFogColor);
-      (scene.fog as THREE.FogExp2).density = 0.045 + progress * 0.05;
+      if (scene.fog) {
+        scene.fog.color.copy(currentFogColor);
+        (scene.fog as THREE.FogExp2).density = 0.045 + progress * 0.05;
+      }
 
       (fogPlane.material as THREE.MeshBasicMaterial).opacity = 0.12 + progress * 0.28;
       (fogPlane.material as THREE.MeshBasicMaterial).color.copy(currentFogColor);
