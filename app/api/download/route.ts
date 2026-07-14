@@ -23,7 +23,7 @@ export async function GET() {
 
   console.log("Next.js Server: Downloading GLB from:", url);
 
-  return new Promise((resolve) => {
+  return new Promise<NextResponse>((resolve) => {
     const file = fs.createWriteStream(dest);
     https.get(url, (response) => {
       if (response.statusCode !== 200) {
