@@ -156,13 +156,13 @@ function SynthHardware() {
           return (
             <group key={idx} position={[xOffset, 0, 0]}>
               {/* Outer metal socket ring */}
-              <mesh>
-                <cylinderGeometry args={[0.09, 0.09, 0.04, 16]} rotation={[Math.PI / 2, 0, 0]} />
+              <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.09, 0.09, 0.04, 16]} />
                 <meshStandardMaterial color="#a1a1aa" metalness={0.9} roughness={0.2} />
               </mesh>
               {/* Inner jack hole */}
-              <mesh position={[0, 0, 0.021]}>
-                <cylinderGeometry args={[0.05, 0.05, 0.01, 16]} rotation={[Math.PI / 2, 0, 0]} />
+              <mesh position={[0, 0, 0.021]} rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.05, 0.05, 0.01, 16]} />
                 <meshBasicMaterial color="#000000" />
               </mesh>
               {/* LED status light right above */}
