@@ -99,7 +99,7 @@ function SynthHardware() {
       </mesh>
 
       {/* Oscilloscope Green Line Waveform */}
-      <line ref={waveRef} geometry={lineGeometry} position={[0, 0.55, 0.02]}>
+      <line ref={waveRef as any} geometry={lineGeometry} position={[0, 0.55, 0.02]}>
         <lineBasicMaterial color="#34d399" linewidth={2} />
       </line>
 

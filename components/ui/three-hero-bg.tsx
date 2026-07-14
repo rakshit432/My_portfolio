@@ -100,7 +100,7 @@ function AnalogWaveLine({ color, speed, amplitude, yOffset, opacity }: { color: 
   });
 
   return (
-    <line ref={lineRef} geometry={geometry} visible={scrollOpacity > 0}>
+    <line ref={lineRef as any} geometry={geometry} visible={scrollOpacity > 0}>
       <lineBasicMaterial color={color} transparent opacity={opacity * scrollOpacity} linewidth={1.5} />
     </line>
   );
