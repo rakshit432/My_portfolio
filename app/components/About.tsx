@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
+import { PortalAnimeCanvas } from "@/components/ui/portal-anime-canvas";
 
 const STATS = [
   { val: "800+", label: "DSA Problems Solved", mono: "LEETCODE // CODEFORCES // GFG" },
@@ -48,7 +49,7 @@ export default function About() {
   const [isScanning, setIsScanning] = useState(false);
 
   // Advanced Telemetry State
-  const [cameraActive, setCameraActive] = useState(false); // start in fingerprint scan by default, opt-in
+  const [scanMode, setScanMode] = useState<"fingerprint" | "webcam" | "portal">("fingerprint");
   const [scanProgress, setScanProgress] = useState(0);
   const [scanLogs, setScanLogs] = useState<string[]>([]);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
@@ -57,11 +58,22 @@ export default function About() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Terminal & Clearance States
+  const [activeTab, setActiveTab] = useState<"dossier" | "stack" | "classified">("dossier");
+  const [isClassifiedUnlocked, setIsClassifiedUnlocked] = useState(false);
+  const [terminalInput, setTerminalInput] = useState("");
+  const [terminalHistory, setTerminalHistory] = useState<string[]>([
+    "SYSTEM DECRYPTION COMPLETED.",
+    "WELCOME VISITOR // SECURE CONNECTION SECURED.",
+    "Type 'help' to view available commands.",
+    ""
+  ]);
+
   // Initialize camera automatically on user activation
   useEffect(() => {
     let activeStream: MediaStream | null = null;
     const enableCamera = async () => {
-      if (!cameraActive) {
+      if (scanMode !== "webcam") {
         if (stream) {
           stream.getTracks().forEach((track) => track.stop());
           setStream(null);
@@ -79,7 +91,7 @@ export default function About() {
         }
       } catch (err) {
         console.warn("Camera permission deferred or unavailable:", err);
-        setCameraActive(false);
+        setScanMode("fingerprint");
       }
     };
     enableCamera();
@@ -88,7 +100,7 @@ export default function About() {
         activeStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [cameraActive]);
+  }, [scanMode]);
 
   // Ensure stream gets assigned to video node if it renders later
   useEffect(() => {
@@ -124,6 +136,35 @@ export default function About() {
     }
   };
 
+  const handlePortalScanComplete = () => {
+    setScanProgress(100);
+    setIsScanning(false);
+    playBeep(880, "sine", 0.12);
+    setTimeout(() => {
+      playBeep(1320, "sine", 0.18);
+    }, 100);
+
+    setScanLogs((prev) => [
+      ...prev,
+      "PORTAL STREAM DECRYPTED // STABLE",
+      "BIOMETRIC COGNITION: APPROVED",
+      "DECRYPTION COMPLETE // CLASSIFIED ACCESS UNLOCKED."
+    ]);
+
+    setIsClassifiedUnlocked(true);
+    setActiveTab("classified");
+    
+    if (window.innerWidth < 1024) {
+      setIsModalOpen(true);
+    } else {
+      const panel = document.getElementById("terminal-profile-panel");
+      if (panel) {
+        panel.classList.add("glitch-highlight");
+        setTimeout(() => panel.classList.remove("glitch-highlight"), 1000);
+      }
+    }
+  };
+
   // Play scanning trigger simulation when clicked or tapped
   const handleCardClick = () => {
     if (isScanning) return;
@@ -132,6 +173,15 @@ export default function About() {
     setScanProgress(0);
     setScanLogs(["INIT SCAN SEQUENCE...", "READYING TELEMETRY..."]);
     playBeep(440, "sawtooth", 0.08);
+
+    if (scanMode === "portal") {
+      setScanLogs([
+        "INIT PORTAL DECRYPTION PIPELINE...",
+        "BYPASSING GATEWAY FIREWALLS...",
+        "DECRYPTING ANOMALY STREAM..."
+      ]);
+      return; // Canvas handles the 10-second timer and onComplete
+    }
 
     let progress = 0;
     const interval = setInterval(() => {
@@ -146,7 +196,15 @@ export default function About() {
           playBeep(1320, "sine", 0.18);
         }, 100);
 
-        setScanLogs((prev) => [...prev, `MATCH STATUS // OK (RAKSHIT)`, "DECIPHER COMPLETE."]);
+        setScanLogs((prev) => [
+          ...prev, 
+          "BIOMETRIC COGNITION: APPROVED", 
+          "UPGRADING CLEARANCE TO LEVEL 2...", 
+          "DECRYPTION COMPLETE // CLASSIFIED ACCESS UNLOCKED."
+        ]);
+
+        setIsClassifiedUnlocked(true);
+        setActiveTab("classified");
         
         // Open credentials modal on mobile viewports
         if (window.innerWidth < 1024) {
@@ -178,9 +236,75 @@ export default function About() {
     }, 90);
   };
 
+  const handleTerminalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cmd = terminalInput.trim().toLowerCase();
+    if (!cmd) return;
+
+    let response: string[] = [];
+    switch (cmd) {
+      case "help":
+        response = [
+          `RK-SHELL:> help`,
+          `Available actions:`,
+          `  secrets  - Display classified information`,
+          `  stats    - Retrieve algorithmic & project telemetry`,
+          `  ping     - Transmit packet into the portal`,
+          `  clear    - Clear console screen`
+        ];
+        break;
+      case "secrets":
+        response = [
+          `RK-SHELL:> secrets`,
+          `> LOCATION // Patna (Origin) -> BIT Mesra (Current).`,
+          `> CORE FUEL // High-potency caffeine & algorithmic puzzles.`,
+          `> SECRETS  // I maintain a 800+ solved DSA nodes inventory.`,
+          `> ELEVEN   // "Friends don't lie." Lights are flickering in Patna...`
+        ];
+        break;
+      case "stats":
+        response = [
+          `RK-SHELL:> stats`,
+          `> UPSTREAM CODE CLARITY // 100% Type-Safe`,
+          `> ALGORITHMS SOLVED    // 800+ (LeetCode/GFG/CodeForces)`,
+          `> LIVE DEPLOYMENTS     // 5 systems active`,
+          `> REPO INTEGRITY       // A+`
+        ];
+        break;
+      case "ping":
+        response = [
+          `RK-SHELL:> ping`,
+          `Sending biometric packet to Portal...`,
+          `[OK] 64 bytes received from Upside Down.`,
+          `Void response: "RUN."`,
+          `Warning: Dimensional shift event triggered!`
+        ];
+        // Trigger visual anomalies
+        window.dispatchEvent(new CustomEvent("avatarShockwave"));
+        window.dispatchEvent(new CustomEvent("dimensionShiftState", { detail: true }));
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("dimensionShiftState", { detail: false }));
+        }, 3000);
+        break;
+      case "clear":
+        setTerminalHistory([]);
+        setTerminalInput("");
+        return;
+      default:
+        response = [
+          `RK-SHELL:> ${cmd}`,
+          `Error: Command '${cmd}' not recognized. Type 'help' for support.`
+        ];
+    }
+
+    setTerminalHistory((prev) => [...prev, ...response, ""]);
+    setTerminalInput("");
+    playBeep(600, "sine", 0.05);
+  };
+
   // Sub-component for rendering info details (shared between mobile modal and desktop side-panel)
   const InfoDetails = () => (
-    <div className="flex flex-col gap-6 text-left">
+    <div className="flex flex-col gap-5 text-left h-full">
       {/* Eyebrow */}
       <div className="font-mono text-xs text-[#C4183C] flex items-center gap-2.5 tracking-wider">
         <span className="w-4 h-px bg-[#C4183C]" />
@@ -192,70 +316,178 @@ export default function About() {
         Technical <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C4183C] to-[#7C3AED]">Profile</span>
       </h3>
 
-      {/* Biography */}
-      <div className="space-y-3 text-xs sm:text-[13px] leading-relaxed text-[#8B8698] font-sans">
-        <p>
-          I&apos;m <span className="text-[#F1EDE4] font-semibold">Rakshit Kumar</span> — a Computer Science
-          & Engineering student at <span className="text-[#F1EDE4]">BIT Mesra, Jharkhand</span>,
-          originally from Patna, Bihar.
-        </p>
-        <p>
-          My development stack centers on building scalable applications using <span className="text-[#F1EDE4]">Next.js</span> and React, backed by Node.js, Express, and MongoDB.
-          I&apos;m also highly active in algorithmic puzzle solving, with <span className="text-[#F1EDE4]">800+ problems solved</span> across LeetCode, Codeforces, and GFG.
-        </p>
-        <p>
-          I regularly integrate <span className="text-[#F1EDE4]">open-source SDKs, libraries, and developer tools</span> to implement real-time systems (Socket.io/WebRTC), AI features (Gemini API), and custom pipelines.
-        </p>
+      {/* Terminal Tabs */}
+      <div className="flex border-b border-white/10 gap-1 sm:gap-2">
+        <button
+          onClick={() => setActiveTab("dossier")}
+          className={`px-3 py-1.5 font-mono text-[9px] sm:text-xs uppercase tracking-wider rounded-t-lg transition-colors cursor-pointer ${
+            activeTab === "dossier"
+              ? "bg-[#120D1E] text-[#C4183C] border-t border-x border-white/10"
+              : "text-[#8B8698] hover:text-[#F1EDE4]"
+          }`}
+        >
+          DOSSIER.txt
+        </button>
+        <button
+          onClick={() => setActiveTab("stack")}
+          className={`px-3 py-1.5 font-mono text-[9px] sm:text-xs uppercase tracking-wider rounded-t-lg transition-colors cursor-pointer ${
+            activeTab === "stack"
+              ? "bg-[#120D1E] text-[#C4183C] border-t border-x border-white/10"
+              : "text-[#8B8698] hover:text-[#F1EDE4]"
+          }`}
+        >
+          STACK.json
+        </button>
+        <button
+          onClick={() => {
+            if (!isClassifiedUnlocked) {
+              playBeep(250, "sawtooth", 0.2);
+              setScanLogs((prev) => [...prev, "ERROR // CLASSIFIED ACCESS DENIED", "BIOMETRIC VERIFICATION REQUIRED"]);
+              // Highlight/flash the scanner on the left to direct users
+              setIsHovered(true);
+              setTimeout(() => setIsHovered(false), 800);
+              return;
+            }
+            setActiveTab("classified");
+          }}
+          className={`px-3 py-1.5 font-mono text-[9px] sm:text-xs uppercase tracking-wider rounded-t-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+            activeTab === "classified"
+              ? "bg-[#120D1E] text-[#C4183C] border-t border-x border-white/10"
+              : isClassifiedUnlocked
+              ? "text-[#4ADE80] hover:text-[#4ADE80]/80 font-bold"
+              : "text-[#8B8698]/60 hover:text-white/80"
+          }`}
+        >
+          {isClassifiedUnlocked ? "🔓" : "🔒"} CLASSIFIED.log
+        </button>
       </div>
 
-      {/* Stack chips */}
-      <div className="flex flex-wrap gap-1">
-        {STACK.map((chip) => (
-          <span
-            key={chip}
-            onMouseEnter={() => setHoveredSkill(chip)}
-            onMouseLeave={() => setHoveredSkill(null)}
-            className="font-mono text-[9px] px-2 py-0.5 rounded border tracking-wide select-none transition-colors duration-200 hover:border-[#C4183C]/40 hover:text-[#F1EDE4] cursor-help"
-            style={{
-              borderColor: "rgba(241,237,228,0.12)",
-              color: "#8B8698",
-              background: "rgba(8,7,12,0.5)",
-            }}
-          >
-            {chip}
-          </span>
-        ))}
-      </div>
-
-      {/* Grid counters */}
-      <div className="grid grid-cols-2 gap-2 mt-1">
-        {STATS.map((stat) => (
-          <div
-            key={stat.label}
-            onMouseEnter={() => setHoveredSkill(stat.label)}
-            onMouseLeave={() => setHoveredSkill(null)}
-            className="p-3 rounded-lg border border-white/5 bg-[#120D1E]/40 backdrop-blur-sm transition-colors duration-300 hover:border-[#7C3AED]/40 cursor-help"
-          >
-            <div
-              className="text-lg font-extrabold tracking-tight leading-none mb-1"
-              style={{
-                fontFamily: "'Unbounded', sans-serif",
-                background: "linear-gradient(115deg, #F1EDE4, #C4183C)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              {stat.val}
+      {/* Tab Contents */}
+      <div className="flex-1 min-h-[300px]">
+        {activeTab === "dossier" && (
+          <div className="space-y-5">
+            {/* Biography */}
+            <div className="space-y-3 text-xs sm:text-[13px] leading-relaxed text-[#8B8698] font-sans font-normal">
+              <p>
+                I&apos;m <span className="text-[#F1EDE4] font-semibold">Rakshit Kumar</span> — a Computer Science
+                & Engineering student at <span className="text-[#F1EDE4]">BIT Mesra, Jharkhand</span>,
+                originally from Patna, Bihar.
+              </p>
+              <p>
+                My development stack centers on building scalable applications using <span className="text-[#F1EDE4]">Next.js</span> and React, backed by Node.js, Express, and MongoDB.
+                I&apos;m also highly active in algorithmic puzzle solving, with <span className="text-[#F1EDE4]">800+ problems solved</span> across LeetCode, Codeforces, and GFG.
+              </p>
+              <p>
+                I regularly integrate <span className="text-[#F1EDE4]">open-source SDKs, libraries, and developer tools</span> to implement real-time systems (Socket.io/WebRTC), AI features (Gemini API), and custom pipelines.
+              </p>
             </div>
-            <div className="text-[9.5px] text-[#F1EDE4]/75 font-medium leading-none mb-1">{stat.label}</div>
-            <div className="font-mono text-[6.5px] text-[#8B8698] uppercase tracking-wider">{stat.mono}</div>
+
+            {/* Grid counters */}
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              {STATS.map((stat) => (
+                <div
+                  key={stat.label}
+                  onMouseEnter={() => setHoveredSkill(stat.label)}
+                  onMouseLeave={() => setHoveredSkill(null)}
+                  className="p-3 rounded-lg border border-white/5 bg-[#120D1E]/40 backdrop-blur-sm transition-colors duration-300 hover:border-[#7C3AED]/40 cursor-help"
+                >
+                  <div
+                    className="text-lg font-extrabold tracking-tight leading-none mb-1"
+                    style={{
+                      fontFamily: "'Unbounded', sans-serif",
+                      background: "linear-gradient(115deg, #F1EDE4, #C4183C)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    {stat.val}
+                  </div>
+                  <div className="text-[9.5px] text-[#F1EDE4]/75 font-medium leading-none mb-1">{stat.label}</div>
+                  <div className="font-mono text-[6.5px] text-[#8B8698] uppercase tracking-wider">{stat.mono}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+        )}
+
+        {activeTab === "stack" && (
+          <div className="space-y-4">
+            <p className="text-xs text-[#8B8698] font-sans font-normal">
+              Hover over any technical variable below to introspect details in the biometric scanner module:
+            </p>
+            {/* Stack chips */}
+            <div className="flex flex-wrap gap-1.5">
+              {STACK.map((chip) => (
+                <span
+                  key={chip}
+                  onMouseEnter={() => setHoveredSkill(chip)}
+                  onMouseLeave={() => setHoveredSkill(null)}
+                  className="font-mono text-[9px] px-2.5 py-1 rounded border tracking-wide select-none transition-all duration-200 hover:border-[#C4183C] hover:text-[#F1EDE4] cursor-help bg-black/50"
+                  style={{
+                    borderColor: "rgba(241,237,228,0.12)",
+                    color: "#8B8698",
+                  }}
+                >
+                  {chip}
+                </span>
+              ))}
+            </div>
+            <div className="p-3 rounded-lg border border-white/5 bg-[#120D1E]/30 min-h-[50px] flex items-center justify-center text-center">
+              {hoveredSkill ? (
+                <div className="text-xs font-mono text-[#22d3ee]">
+                  <span className="text-[#C4183C] font-semibold">{hoveredSkill}:</span> {SKILL_DESC[hoveredSkill] || "Verified component."}
+                </div>
+              ) : (
+                <div className="text-xs font-mono text-[#8B8698]">
+                  &gt; Awaiting skill selection...
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "classified" && (
+          <div className="border border-white/10 rounded-xl bg-black/80 p-4 font-mono text-[10px] h-[300px] flex flex-col justify-between select-text relative">
+            {!isClassifiedUnlocked ? (
+              <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                <span className="text-2xl mb-2 animate-bounce">🔒</span>
+                <span className="text-[#C4183C] font-bold uppercase tracking-wider mb-2">ACCESS RESTRICTED</span>
+                <p className="text-[#8B8698] text-[9px] max-w-xs leading-relaxed">
+                  Biometric authorization required. Place your finger on the scanner card (or use facecam) to upgrade clearance levels.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Terminal Logs */}
+                <div className="flex-1 overflow-y-auto space-y-1 pr-2 border-b border-white/5 pb-2 mb-2 scrollbar-thin select-text text-left max-h-[220px]">
+                  {terminalHistory.map((line, idx) => (
+                    <div key={idx} className={`${line.startsWith("RK-SHELL:>") ? "text-[#C4183C]" : line.includes("Error") ? "text-red-500" : "text-[#4ADE80]"}`}>
+                      {line}
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Terminal Form */}
+                <form onSubmit={handleTerminalSubmit} className="flex gap-2 items-center pointer-events-auto mt-auto">
+                  <span className="text-[#C4183C] shrink-0">RK-SHELL:&gt;</span>
+                  <input
+                    type="text"
+                    value={terminalInput}
+                    onChange={(e) => setTerminalInput(e.target.value)}
+                    placeholder="type 'help' for commands..."
+                    className="flex-1 bg-transparent border-none outline-none text-[#4ADE80] font-mono text-[10px] py-1"
+                    autoFocus
+                  />
+                </form>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* CTA Button Row */}
-      <div className="flex gap-2 flex-wrap mt-2">
+      <div className="flex gap-2 flex-wrap mt-auto">
         <a
           href="https://github.com/rakshit432"
           target="_blank"
@@ -316,6 +548,14 @@ export default function About() {
           50% { border-color: rgba(34,211,238,1); background: rgba(196,24,60,0.15); filter: hue-rotate(-15deg); }
           100% { border-color: transparent; background: transparent; }
         }
+        @keyframes portal-drift {
+          0% { transform: scale(1.05) translate(1px, -1px); filter: brightness(0.6) contrast(1.25); }
+          50% { transform: scale(1.08) translate(-1px, 2px); filter: brightness(0.68) contrast(1.3); }
+          100% { transform: scale(1.05) translate(2px, 0px); filter: brightness(0.58) contrast(1.2); }
+        }
+        .portal-drift-img {
+          animation: portal-drift 12s ease-in-out infinite alternate;
+        }
       `}</style>
 
       {/* Radial accent glows */}
@@ -352,7 +592,9 @@ export default function About() {
           <div
             className={`w-full lg:w-[320px] shrink-0 rounded-xl border p-4 sm:p-5 relative group overflow-hidden flex flex-col justify-between select-none shadow-2xl cursor-pointer transition-all duration-500 bg-[#0A0A0C]/95 ${
               isHovered || isScanning
-                ? "border-[#C4183C]/60 shadow-[0_0_35px_rgba(196,24,60,0.25)]" 
+                ? isClassifiedUnlocked
+                  ? "border-[#4ADE80]/60 shadow-[0_0_35px_rgba(74,222,128,0.25)]"
+                  : "border-[#C4183C]/60 shadow-[0_0_35px_rgba(196,24,60,0.25)]" 
                 : "border-white/5"
             }`}
             onMouseEnter={() => setIsHovered(true)}
@@ -377,22 +619,32 @@ export default function About() {
                     Access Scan Control
                   </span>
                   <span className="font-mono text-[7px] text-[#8B8698] uppercase">
-                    SYS.LOG // {cameraActive ? "WEBCAM_MODE" : "FINGERPRINT_MODE"}
+                    SYS.LOG // {scanMode === "webcam" ? "WEBCAM_MODE" : scanMode === "portal" ? "PORTAL_MODE" : "FINGERPRINT_MODE"}
                   </span>
                 </div>
-                <span className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${isScanning ? "bg-[#4ADE80] animate-ping" : isHovered ? "bg-[#22d3ee] animate-pulse" : "bg-[#C4183C]"}`} />
+                <span className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                  isScanning 
+                    ? "bg-[#4ADE80] animate-ping" 
+                    : isHovered 
+                    ? "bg-[#22d3ee] animate-pulse" 
+                    : isClassifiedUnlocked
+                    ? "bg-[#4ADE80]" 
+                    : "bg-[#C4183C]"
+                }`} />
               </div>
 
               {/* Mode Selectors */}
-              <div className="flex gap-1.5 mb-3 pointer-events-auto relative z-30">
+              <div className="flex gap-1 mb-3 pointer-events-auto relative z-30">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setCameraActive(false);
+                    setScanMode("fingerprint");
                   }}
-                  className={`flex-1 py-1 font-mono text-[7.5px] uppercase tracking-wider rounded border transition-all ${
-                    !cameraActive
-                      ? "border-[#C4183C]/50 bg-[#C4183C]/10 text-white font-bold"
+                  className={`flex-1 py-1 font-mono text-[7px] uppercase tracking-wider rounded border transition-all ${
+                    scanMode === "fingerprint"
+                      ? isClassifiedUnlocked
+                        ? "border-[#4ADE80]/50 bg-[#4ADE80]/10 text-white font-bold"
+                        : "border-[#C4183C]/50 bg-[#C4183C]/10 text-white font-bold"
                       : "border-white/5 bg-transparent text-[#8B8698] hover:border-white/20 hover:text-white"
                   }`}
                 >
@@ -401,23 +653,42 @@ export default function About() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setCameraActive(true);
+                    setScanMode("webcam");
                   }}
-                  className={`flex-1 py-1 font-mono text-[7.5px] uppercase tracking-wider rounded border transition-all ${
-                    cameraActive
+                  className={`flex-1 py-1 font-mono text-[7px] uppercase tracking-wider rounded border transition-all ${
+                    scanMode === "webcam"
                       ? "border-[#22d3ee]/50 bg-[#22d3ee]/10 text-white font-bold"
                       : "border-white/5 bg-transparent text-[#8B8698] hover:border-white/20 hover:text-white"
                   }`}
                 >
                   Face Cam
                 </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setScanMode("portal");
+                  }}
+                  className={`flex-1 py-1 font-mono text-[7px] uppercase tracking-wider rounded border transition-all ${
+                    scanMode === "portal"
+                      ? "border-[#7C3AED]/50 bg-[#7C3AED]/10 text-white font-bold"
+                      : "border-white/5 bg-transparent text-[#8B8698] hover:border-white/20 hover:text-white"
+                  }`}
+                >
+                  Portal Feed
+                </button>
               </div>
 
               {/* Recessed Avatar scanner viewport */}
-              <div className={`relative w-full h-[210px] sm:h-[230px] rounded-lg overflow-hidden border bg-[#040406] flex items-center justify-center transition-colors duration-500 ${isHovered || isScanning ? "border-[#C4183C]/40" : "border-white/10"}`}>
+              <div className={`relative w-full h-[210px] sm:h-[230px] rounded-lg overflow-hidden border bg-[#040406] flex items-center justify-center transition-colors duration-500 ${
+                isHovered || isScanning 
+                  ? isClassifiedUnlocked
+                    ? "border-[#4ADE80]/40"
+                    : "border-[#C4183C]/40"
+                  : "border-white/10"
+              }`}>
                 
-                {/* 1. Live WebCam feed if active */}
-                {cameraActive ? (
+                 {/* 1. Live WebCam feed if active */}
+                {scanMode === "webcam" ? (
                   stream ? (
                     <video
                       ref={videoRef}
@@ -441,15 +712,61 @@ export default function About() {
                       </span>
                     </div>
                   )
+                ) : scanMode === "portal" ? (
+                  /* Anomaly Portal Live Visual showing Rakshit in Stranger Things */
+                  <div className="absolute inset-0 z-0 bg-[#0A0A0C] overflow-hidden flex items-center justify-center">
+                    {/* Render active 10-second canvas anime sequence if scanning */}
+                    {isScanning ? (
+                      <PortalAnimeCanvas
+                        imageSrc="/rakshit_anime_portal.png"
+                        isActive={isScanning}
+                        onComplete={handlePortalScanComplete}
+                      />
+                    ) : (
+                      <img
+                        src="/rakshit_anime_portal.png"
+                        alt="Portal Anomaly Feed"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            const fallback = parent.querySelector(".portal-fallback");
+                            if (fallback) fallback.classList.remove("hidden");
+                          }
+                        }}
+                        className="w-full h-full object-cover opacity-80 filter select-none pointer-events-none scale-105 portal-drift-img"
+                      />
+                    )}
+                    {/* Retro fallback text shown if copy_image.js was not executed yet */}
+                    <div className="portal-fallback hidden absolute inset-0 flex flex-col items-center justify-center p-6 text-center font-mono z-10">
+                      <svg className="w-5 h-5 text-[#7C3AED] animate-pulse mb-2" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                      </svg>
+                      <span className="text-[7.5px] text-[#7C3AED] tracking-widest uppercase mb-1 font-bold">
+                        SIGNAL CORRUPTED // NO IMAGE
+                      </span>
+                      <span className="text-[6.5px] text-[#8B8698] uppercase leading-relaxed max-w-[170px]">
+                        Please execute &apos;node copy_image.js&apos; in your project terminal to copy the generated anime portrait.
+                      </span>
+                    </div>
+                    {/* Retro telemetry lines overlay on image */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#7C3AED]/10 via-transparent to-[#C4183C]/10 opacity-50 mix-blend-overlay pointer-events-none" />
+                  </div>
                 ) : (
                   /* Fingerprint Scanner Visual */
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-[#0A0A0C]/50 z-0">
                     <div className="relative w-24 h-24 flex items-center justify-center">
                       <div className="absolute inset-0 rounded-full border border-[#22d3ee]/10 animate-ping opacity-60 pointer-events-none" />
-                      <div className="absolute w-16 h-16 rounded-full border border-[#C4183C]/20 animate-pulse pointer-events-none" />
+                      <div className={`absolute w-16 h-16 rounded-full border animate-pulse pointer-events-none transition-colors duration-500 ${isClassifiedUnlocked ? "border-[#4ADE80]/20" : "border-[#C4183C]/20"}`} />
                       
                       <svg
-                        className={`w-12 h-12 transition-colors duration-300 ${isScanning ? "text-[#4ADE80] scale-105" : "text-[#22d3ee]/70 group-hover:text-[#C4183C]"}`}
+                        className={`w-12 h-12 transition-colors duration-300 ${
+                          isScanning 
+                            ? "text-[#4ADE80] scale-105" 
+                            : isClassifiedUnlocked
+                            ? "text-[#4ADE80]/80 group-hover:text-[#4ADE80]"
+                            : "text-[#22d3ee]/70 group-hover:text-[#C4183C]"
+                        }`}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -490,13 +807,31 @@ export default function About() {
                 </div>
 
                 {/* Center Tracking Crosshair Target */}
-                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 border border-dashed rounded-full flex items-center justify-center pointer-events-none z-20 transition-all duration-700 ${isHovered || isScanning ? "rotate-90 scale-110 border-[#C4183C]/70" : "border-[#22d3ee]/35"}`}>
-                  <div className={`w-3 h-px transition-colors duration-500 ${isHovered || isScanning ? "bg-[#C4183C]/80" : "bg-[#22d3ee]/80"}`} />
-                  <div className={`h-3 w-px absolute transition-colors duration-500 ${isHovered || isScanning ? "bg-[#C4183C]/80" : "bg-[#22d3ee]/80"}`} />
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 border border-dashed rounded-full flex items-center justify-center pointer-events-none z-20 transition-all duration-700 ${
+                  isHovered || isScanning 
+                    ? isClassifiedUnlocked
+                      ? "rotate-90 scale-110 border-[#4ADE80]/70"
+                      : "rotate-90 scale-110 border-[#C4183C]/70" 
+                    : "border-[#22d3ee]/35"
+                }`}>
+                  <div className={`w-3 h-px transition-colors duration-500 ${
+                    isHovered || isScanning 
+                      ? isClassifiedUnlocked
+                        ? "bg-[#4ADE80]/80"
+                        : "bg-[#C4183C]/80" 
+                      : "bg-[#22d3ee]/80"
+                  }`} />
+                  <div className={`h-3 w-px absolute transition-colors duration-500 ${
+                    isHovered || isScanning 
+                      ? isClassifiedUnlocked
+                        ? "bg-[#4ADE80]/80"
+                        : "bg-[#C4183C]/80" 
+                      : "bg-[#22d3ee]/80"
+                  }`} />
                 </div>
 
                 {/* Cybernetic Neon Face Blueprint Overlay (Webcam active only) */}
-                {cameraActive && (
+                {scanMode === "webcam" && (
                   <div 
                     className={`absolute inset-0 flex items-center justify-center pointer-events-none z-10 transition-all duration-500 ${isHovered || isScanning ? "opacity-75 scale-102 filter drop-shadow-[0_0_6px_#22d3ee]" : "opacity-35"}`}
                     style={{ animation: "blueprint-glow 4s ease-in-out infinite" }}
@@ -519,7 +854,7 @@ export default function About() {
                 )}
 
                 {/* Live Telemetry Decryption Console Overlay */}
-                {isScanning && (
+                {isScanning && scanMode !== "portal" && (
                   <div className="absolute inset-0 bg-black/90 flex flex-col justify-center items-start p-4 font-mono z-30 select-none text-left">
                     <div className="w-full space-y-1 text-[7px] text-[#4ADE80] h-[72px] overflow-hidden">
                       {scanLogs.map((log, idx) => (
@@ -553,20 +888,20 @@ export default function About() {
 
                 {/* Active scan matrix overlay on hover/scan */}
                 {(isHovered || isScanning) && (
-                  <div className="absolute inset-0 bg-[#C4183C]/5 backdrop-blur-[0.5px] p-2 flex flex-col justify-between pointer-events-none z-0">
-                    <div className="flex justify-between font-mono text-[6.5px] text-[#C4183C]">
-                      <span>{isScanning ? "SYS.DECRYPTING..." : "SYS.DECRYPT.ACTIVE"}</span>
+                  <div className={`absolute inset-0 backdrop-blur-[0.5px] p-2 flex flex-col justify-between pointer-events-none z-0 ${isClassifiedUnlocked ? "bg-[#4ADE80]/5" : "bg-[#C4183C]/5"}`}>
+                    <div className={`flex justify-between font-mono text-[6.5px] ${isClassifiedUnlocked ? "text-[#4ADE80]" : "text-[#C4183C]"}`}>
+                      <span>{isScanning ? "SYS.DECRYPTING..." : isClassifiedUnlocked ? "ACCESS.AUTHORIZED" : "SYS.DECRYPT.ACTIVE"}</span>
                       <span>NODE // OK</span>
                     </div>
-                    <div className="flex justify-between font-mono text-[6.5px] text-[#C4183C]/80">
-                      <span>MATRIX_LOCK: ENABLED</span>
+                    <div className={`flex justify-between font-mono text-[6.5px] ${isClassifiedUnlocked ? "text-[#4ADE80]/80" : "text-[#C4183C]/80"}`}>
+                      <span>MATRIX_LOCK: {isClassifiedUnlocked ? "BYPASSED" : "ENABLED"}</span>
                       <span>PORT: 3000</span>
                     </div>
                   </div>
                 )}
 
                 {/* Scanning overlay noise */}
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-[#C4183C]/5 pointer-events-none transition-colors duration-300 z-10" />
+                <div className={`absolute inset-0 bg-black/10 group-hover:${isClassifiedUnlocked ? "bg-[#4ADE80]/5" : "bg-[#C4183C]/5"} pointer-events-none transition-colors duration-300 z-10`} />
               </div>
             </div>
 
@@ -594,7 +929,7 @@ export default function About() {
                   </span>
                 </div>
                 <div className="w-20 h-5 overflow-hidden relative opacity-50 shrink-0">
-                  <svg className="w-full h-full text-[#C4183C]" viewBox="0 0 100 30" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <svg className={`w-full h-full transition-colors duration-500 ${isClassifiedUnlocked ? "text-[#4ADE80]" : "text-[#C4183C]"}`} viewBox="0 0 100 30" fill="none" stroke="currentColor" strokeWidth="1.5">
                     <path d="M0,15 H25 L30,5 L35,25 L40,15 H60 L65,0 L70,30 L75,15 H100" />
                   </svg>
                   <div
@@ -611,8 +946,8 @@ export default function About() {
               </div>
 
               {/* Mobile Prompt helper */}
-              <div className="lg:hidden mt-3 text-[7.5px] font-mono text-[#C4183C] uppercase tracking-widest animate-pulse">
-                {isScanning ? "SCANNING TELEMETRY..." : "Tap Card for Full Credentials"}
+              <div className={`lg:hidden mt-3 text-[7.5px] font-mono uppercase tracking-widest animate-pulse ${isClassifiedUnlocked ? "text-[#4ADE80]" : "text-[#C4183C]"}`}>
+                {isScanning ? "SCANNING TELEMETRY..." : isClassifiedUnlocked ? "ACCESS LEVEL 2 AUTHORIZED" : "Tap Card for Full Credentials"}
               </div>
             </div>
           </div>

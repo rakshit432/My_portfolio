@@ -51,6 +51,7 @@ export function CinematicCharacter() {
   const [dialogue, setDialogue] = useState("");
   const [isBubbleOpen, setIsBubbleOpen] = useState(true);
   const [spinCount, setSpinCount] = useState(0);
+  const [isHidden, setIsHidden] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -230,6 +231,25 @@ export function CinematicCharacter() {
     window.dispatchEvent(shockEvent);
   };
 
+  if (isHidden) {
+    return (
+      <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-[9985]">
+        <button
+          onClick={() => {
+            setIsHidden(false);
+            setIsBubbleOpen(true);
+            const remarks = DIALOGUES[activeSection] || ["Systems stable."];
+            setDialogue(remarks[Math.floor(Math.random() * remarks.length)]);
+          }}
+          className="w-10 h-10 rounded-full border border-[#C4183C]/30 bg-black/80 hover:bg-[#120D1E] hover:border-[#7C3AED]/50 flex items-center justify-center pointer-events-auto transition-all shadow-[0_0_15px_rgba(196,24,60,0.15)] group cursor-pointer"
+          title="Show Guide"
+        >
+          <span className="font-mono text-[10px] text-[#C4183C] group-hover:text-[#7C3AED] transition-colors">{`>_`}</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-[9985] flex flex-col items-end pointer-events-none">
       {/* Typewriter speech bubble */}
@@ -263,6 +283,19 @@ export function CinematicCharacter() {
           rotateY: { type: "spring", stiffness: 120, damping: 20 },
         }}
       >
+        {/* Close/Hide Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsHidden(true);
+            setIsBubbleOpen(false);
+          }}
+          className="absolute top-2 right-2 w-5 h-5 rounded-md border border-white/5 bg-black/60 hover:bg-[#C4183C]/20 hover:border-[#C4183C]/40 flex items-center justify-center pointer-events-auto transition-all opacity-0 group-hover:opacity-100 z-30 cursor-pointer"
+          title="Hide Guide"
+        >
+          <span className="font-mono text-[8px] text-white/60 hover:text-white">&times;</span>
+        </button>
+
         {/* Subtle grid pattern background */}
         <div className="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:10px_10px]" />
         

@@ -355,6 +355,110 @@ function MediversalVisual() {
   );
 }
 
+// ─── PROJECT 5: RESUME BUILDER — Modular Document assembly ───────────────────
+function ResumeBuilderVisual() {
+  const groupRef = useRef<THREE.Group>(null!);
+  const blocksRef = useRef<THREE.Group>(null!);
+  const impulse = usePianoImpulse();
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    const mx = state.pointer.x * 0.35;
+    const my = state.pointer.y * 0.35;
+
+    impulse.current = THREE.MathUtils.lerp(impulse.current, 1.0, 0.08);
+    groupRef.current.scale.setScalar(impulse.current);
+
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, t * 0.15 + mx, 0.07);
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -0.1 + my, 0.07);
+    groupRef.current.position.y = Math.sin(t * 1.0) * 0.05;
+
+    // Animate the floating layout blocks
+    if (blocksRef.current) {
+      blocksRef.current.children.forEach((child, idx) => {
+        child.position.z = Math.sin(t * 1.5 + idx) * 0.12 + 0.05;
+        child.rotation.z = Math.cos(t * 0.5 + idx) * 0.05;
+      });
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {/* The main document backing canvas */}
+      <mesh>
+        <planeGeometry args={[0.7, 0.95]} />
+        <meshPhysicalMaterial
+          color="#120D1E"
+          transmission={0.8}
+          roughness={0.2}
+          thickness={0.5}
+          clearcoat={0.8}
+          transparent
+          opacity={0.85}
+        />
+      </mesh>
+      <mesh>
+        <edgesGeometry args={[new THREE.PlaneGeometry(0.7, 0.95)]} />
+        <lineBasicMaterial color="#7c3aed" />
+      </mesh>
+
+      {/* Structured resume sections / text bars */}
+      <group position={[0, 0, 0.005]}>
+        {/* Header Block */}
+        <mesh position={[0, 0.32, 0]}>
+          <planeGeometry args={[0.5, 0.08]} />
+          <meshBasicMaterial color="#c4183c" transparent opacity={0.35} />
+        </mesh>
+        
+        {/* Profile line */}
+        <mesh position={[-0.1, 0.20, 0]}>
+          <planeGeometry args={[0.3, 0.02]} />
+          <meshBasicMaterial color="#8b8698" transparent opacity={0.5} />
+        </mesh>
+        
+        {/* Body Blocks (sections) */}
+        {[-0.02, -0.15, -0.28].map((y, i) => (
+          <group key={i} position={[0, y, 0]}>
+            {/* Section title heading */}
+            <mesh position={[-0.18, 0.06, 0]}>
+              <planeGeometry args={[0.14, 0.03]} />
+              <meshBasicMaterial color="#7c3aed" transparent opacity={0.6} />
+            </mesh>
+            {/* Paragraph lines */}
+            <mesh position={[0.02, 0.01, 0]}>
+              <planeGeometry args={[0.26, 0.015]} />
+              <meshBasicMaterial color="#8b8698" transparent opacity={0.4} />
+            </mesh>
+            <mesh position={[0.02, -0.02, 0]}>
+              <planeGeometry args={[0.26, 0.015]} />
+              <meshBasicMaterial color="#8b8698" transparent opacity={0.4} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+
+      {/* Floating modular components compiling onto the sheet */}
+      <group ref={blocksRef}>
+        {/* Top-Right Contact Info chip */}
+        <mesh position={[0.42, 0.3, 0.1]}>
+          <boxGeometry args={[0.2, 0.08, 0.02]} />
+          <meshStandardMaterial color="#c4183c" emissive="#c4183c" emissiveIntensity={0.6} />
+        </mesh>
+        {/* Skills Tag chip */}
+        <mesh position={[-0.45, -0.05, 0.15]}>
+          <boxGeometry args={[0.18, 0.07, 0.02]} />
+          <meshStandardMaterial color="#7c3aed" emissive="#7c3aed" emissiveIntensity={0.5} />
+        </mesh>
+        {/* Experience details block */}
+        <mesh position={[0.45, -0.18, 0.08]}>
+          <boxGeometry args={[0.24, 0.1, 0.02]} />
+          <meshStandardMaterial color="#22d3ee" emissive="#22d3ee" emissiveIntensity={0.4} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 // ─── CANVAS WRAPPER ──────────────────────────────────────────────────────────
 export default function ThreeProjectVisualizer({ projectId }: { projectId: string }) {
   return (
@@ -369,10 +473,12 @@ export default function ThreeProjectVisualizer({ projectId }: { projectId: strin
         <directionalLight position={[-2, -1, 2]} intensity={0.4} color="#ddd6fe" />
         <pointLight position={[0, 0, -1.5]} intensity={3.5} distance={4} color="#7c3aed" />
 
-        {projectId === "futuremeet"  && <FutureMeetVisual />}
-        {projectId === "nexusdb"     && <NexusDBVisual />}
-        {projectId === "smartfin"    && <SmartFinVisual />}
-        {projectId === "mediversal"  && <MediversalVisual />}
+        {projectId === "futuremeet"    && <FutureMeetVisual />}
+        {projectId === "nexusdb"       && <NexusDBVisual />}
+        {projectId === "smartfin"      && <SmartFinVisual />}
+        {projectId === "blogonspot"    && <SmartFinVisual />}
+        {projectId === "resumebuilder" && <ResumeBuilderVisual />}
+        {projectId === "mediversal"    && <MediversalVisual />}
       </Canvas>
     </div>
   );
